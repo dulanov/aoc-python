@@ -1,6 +1,6 @@
 # AOC (Advent of Code)
 
-[Advent of Code](https://adventofcode.com) solutions in vanilla [Python](https://www.python.org/) without any external dependencies.
+[Advent of Code](https://adventofcode.com) solutions in vanilla [Python](https://www.python.org/) without using any external dependencies.
 
 ## Usage
 
