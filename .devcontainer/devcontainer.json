@@ -1,0 +1,23 @@
+{
+    "name": "Python 3 (GitHub Codespaces)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "ms-python.python",
+                "ms-python.black-formatter",
+                "ms-python.vscode-pylance",
+                "streetsidesoftware.code-spell-checker"
+            ]
+        }
+    },
+    "onCreateCommand": "pipx install pre-commit",
+    "postStartCommand": "pre-commit autoupdate && pre-commit install --install-hooks"
+}

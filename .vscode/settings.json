@@ -1,0 +1,19 @@
+{
+    "cSpell.language": "en,en-US",
+    "cSpell.words": [
+    ],
+    "files.exclude": {
+        "*/**/__pycache__": true
+    },
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.codeActionsOnSave": {
+            "source.fixAll": true
+        }
+    },
+    "python.languageServer": "Pylance",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.diagnosticMode": "openFilesOnly",
+    "python.testing.unittestEnabled": true
+}
