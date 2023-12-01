@@ -21,7 +21,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_one(example.splitlines()))
     142
 
-    >>> sum(part_one(open(f"2023/day{day}.in")))
+    >>> sum(part_one(read(f"2023/day{day}.in")))
     55130
     """
     return [t[0] * 10 + t[-1] for t in scan(puzzle)]
@@ -31,6 +31,12 @@ def scan(puzzle: Iterable[str]) -> Iterable[Tuple[int, ...]]:
     for line in puzzle:
         digits = [c for c in line if c.isdigit()]
         yield tuple(map(int, digits))
+
+
+def read(file: str) -> Iterable[str]:
+    with open(file, "r") as file:
+        for line in file:
+            yield line.strip()
 
 
 def load_tests(loader, tests, ignore):
