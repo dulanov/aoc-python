@@ -4,7 +4,7 @@
 
 ## Usage
 
-All solutions can be checked with doctest & unittest modules from [the python's standard library](https://docs.python.org/3/library/index.html).
+All solutions can be checked with [doctest module](https://docs.python.org/3/library/doctest.html) by running the following command:
 
 ```shell
 python -m unittest discover -p *.py
