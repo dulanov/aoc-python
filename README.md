@@ -6,7 +6,9 @@
 
 All solutions can be checked with doctest & unittest modules from [the python's standard library](https://docs.python.org/3/library/index.html).
 
-TBD
+```shell
+python -m unittest discover -p *.py
+```
 
 ## Unlicense
 
