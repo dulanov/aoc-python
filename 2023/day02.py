@@ -1,3 +1,4 @@
+import functools
 from typing import Iterable, Iterator
 import doctest
 import re
@@ -32,6 +33,10 @@ class RGB:
     def __repr__(self):
         return f"RGB({self.r}, {self.g}, {self.b})"
 
+    @classmethod
+    def union(cls, l, r):
+        return RGB(max(l.r, r.r), max(l.g, r.g), max(l.b, r.b))
+
 
 def part_one(
     puzzle: Iterable[str], limits: RGB = RGB(12, 13, 14)
@@ -49,12 +54,8 @@ def part_one(
     """
     i, result = 0, []
     for game in scan(puzzle):
-        i, win = i + 1, True
-        for set in game:
-            if set.r > limits.r or set.g > limits.g or set.b > limits.b:
-                win = False
-                break
-        if win:
+        i, game = i + 1, functools.reduce(lambda x, y: RGB.union(x, y), game)
+        if game.r <= limits.r and game.g <= limits.g and game.b <= limits.b:
             result.append(i)
     return result
 
@@ -73,10 +74,8 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     """
     result = []
     for game in scan(puzzle):
-        r, g, b = 0, 0, 0
-        for set in game:
-            r, g, b = max(r, set.r), max(g, set.g), max(b, set.b)
-        result.append(r * g * b)
+        game = functools.reduce(lambda x, y: RGB.union(x, y), game)
+        result.append(game.r * game.g * game.b)
     return result
 
 
