@@ -22,15 +22,15 @@ zoneight234
 """
 
 replacements = {
-    "one": "1ne",
-    "two": "2wo",
-    "three": "3hree",
-    "four": "4our",
-    "five": "5ive",
-    "six": "6ix",
-    "seven": "7even",
-    "eight": "8ight",
-    "nine": "9ine",
+    "one": "o1e",
+    "two": "t2o",
+    "three": "t3e",
+    "four": "4",
+    "five": "5e",
+    "six": "6",
+    "seven": "7n",
+    "eight": "e8t",
+    "nine": "n9e",
 }
 
 
@@ -66,11 +66,8 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
 
 def scan(puzzle: Iterable[str], reps: dict[str, str] = []) -> Iterator[tuple[int, ...]]:
     for line in puzzle:
-        if reps:
-            if m := re.search(rf"{'|'.join(reps.keys())}", line):
-                line = line.replace(m.group(), reps[m.group()], 1)
-            if m := re.search(rf"{'|'.join(map(rev, reps.keys()))}", rev(line)):
-                line = rev(rev(line).replace(m.group(), rev(reps[rev(m.group())]), 1))
+        for r in reps:
+            line = line.replace(r, reps[r])
         digits = [c for c in line if c.isdigit()]
         yield tuple(map(int, digits))
 
