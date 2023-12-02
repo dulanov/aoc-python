@@ -1,4 +1,4 @@
-from typing import Iterable, Tuple
+from typing import Iterable, Iterator
 import doctest
 import re
 
@@ -64,13 +64,13 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     return [t[0] * 10 + t[-1] for t in scan(puzzle, replacements)]
 
 
-def scan(puzzle: Iterable[str], reps: dict[str, str] = []) -> Iterable[Tuple[int, ...]]:
+def scan(puzzle: Iterable[str], reps: dict[str, str] = []) -> Iterator[tuple[int, ...]]:
     for line in puzzle:
         if reps:
-            if m := re.search(rf"({'|'.join(reps.keys())})", line):
-                line = line.replace(m.group(0), reps[m.group(0)], 1)
-            if m := re.search(rf"({'|'.join(map(rev, reps.keys()))})", rev(line)):
-                line = rev(rev(line).replace(m.group(0), rev(reps[rev(m.group(0))]), 1))
+            if m := re.search(rf"{'|'.join(reps.keys())}", line):
+                line = line.replace(m.group(), reps[m.group()], 1)
+            if m := re.search(rf"{'|'.join(map(rev, reps.keys()))}", rev(line)):
+                line = rev(rev(line).replace(m.group(), rev(reps[rev(m.group())]), 1))
         digits = [c for c in line if c.isdigit()]
         yield tuple(map(int, digits))
 
@@ -79,7 +79,7 @@ def rev(s: str) -> str:
     return s[::-1]
 
 
-def read(file: str) -> Iterable[str]:
+def read(file: str) -> Iterator[str]:
     with open(file, "r") as file:
         for line in file:
             yield line
