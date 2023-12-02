@@ -64,10 +64,10 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     return [t[0] * 10 + t[-1] for t in scan(puzzle, replacements)]
 
 
-def scan(puzzle: Iterable[str], reps: dict[str, str] = []) -> Iterator[tuple[int, ...]]:
+def scan(puzzle: Iterable[str], reps: dict[str, str] = {}) -> Iterator[tuple[int, ...]]:
     for line in puzzle:
-        for r in reps:
-            line = line.replace(r, reps[r])
+        for k, v in reps.items():
+            line = line.replace(k, v)
         digits = [c for c in line if c.isdigit()]
         yield tuple(map(int, digits))
 
