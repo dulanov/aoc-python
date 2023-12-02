@@ -43,7 +43,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_one(example1.splitlines()))
     142
 
-    >>> sum(part_one(read(f"2023/day{day}.in")))
+    >>> sum(part_one(open(f"2023/day{day}.in").readlines()))
     55130
     """
     return [t[0] * 10 + t[-1] for t in scan(puzzle)]
@@ -58,7 +58,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_two(example2.splitlines()))
     281
 
-    >>> sum(part_two(read(f"2023/day{day}.in")))
+    >>> sum(part_two(open(f"2023/day{day}.in").readlines()))
     54985
     """
     return [t[0] * 10 + t[-1] for t in scan(puzzle, replacements)]
@@ -77,12 +77,6 @@ def scan(puzzle: Iterable[str], reps: dict[str, str] = []) -> Iterator[tuple[int
 
 def rev(s: str) -> str:
     return s[::-1]
-
-
-def read(file: str) -> Iterator[str]:
-    with open(file, "r") as file:
-        for line in file:
-            yield line
 
 
 def load_tests(loader, tests, ignore):

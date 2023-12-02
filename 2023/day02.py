@@ -1,6 +1,6 @@
-import functools
 from typing import Iterable, Iterator
 import doctest
+import functools
 import re
 
 day = "02"
@@ -49,14 +49,14 @@ def part_one(
     >>> sum(part_one(example1.splitlines()))
     8
 
-    >>> sum(part_one(read(f"2023/day{day}.in")))
+    >>> sum(part_one(open(f"2023/day{day}.in").readlines()))
     2101
     """
-    i, result = 0, []
-    for game in scan(puzzle):
-        i, game = i + 1, functools.reduce(lambda x, y: RGB.union(x, y), game)
+    result = []
+    for idx, game in enumerate(scan(puzzle), start=1):
+        game = functools.reduce(lambda x, y: RGB.union(x, y), game)
         if game.r <= limits.r and game.g <= limits.g and game.b <= limits.b:
-            result.append(i)
+            result.append(idx)
     return result
 
 
@@ -69,7 +69,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_two(example2.splitlines()))
     2286
 
-    >>> sum(part_two(read(f"2023/day{day}.in")))
+    >>> sum(part_two(open(f"2023/day{day}.in").readlines()))
     58269
     """
     result = []
@@ -97,12 +97,6 @@ def scan(puzzle: Iterable[str]) -> Iterator[list[RGB]]:
             game.append(RGB(r, g, b))
         games.append(game)
     return games
-
-
-def read(file: str) -> Iterator[str]:
-    with open(file, "r") as file:
-        for line in file:
-            yield line
 
 
 def load_tests(loader, tests, ignore):
