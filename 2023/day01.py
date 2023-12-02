@@ -1,6 +1,5 @@
 from typing import Iterable, Iterator
 import doctest
-import re
 
 day = "01"
 
@@ -70,10 +69,6 @@ def scan(puzzle: Iterable[str], reps: dict[str, str] = {}) -> Iterator[tuple[int
             line = line.replace(k, v)
         digits = [c for c in line if c.isdigit()]
         yield tuple(map(int, digits))
-
-
-def rev(s: str) -> str:
-    return s[::-1]
 
 
 def load_tests(loader, tests, ignore):
