@@ -38,9 +38,7 @@ class RGB:
         return RGB(max(l.r, r.r), max(l.g, r.g), max(l.b, r.b))
 
 
-def part_one(
-    puzzle: Iterable[str], limits: RGB = RGB(12, 13, 14)
-) -> list[tuple[int, bool]]:
+def part_one(puzzle: Iterable[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
