@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Iterable, Iterator
 import doctest
 import re
+import uuid
 
 day = "03"
 
@@ -38,7 +39,7 @@ class Point:
     def __repr__(self) -> str:
         return f"Point({self.x}, {self.y})"
 
-    def adjacent(self, ln: int) -> list[Point]:
+    def adjacent(self, ln: int = 1) -> list[Point]:
         """Return the adjacent points."""
         points = [
             Point(self.x - 1, self.y - 1),
@@ -57,10 +58,10 @@ class Point:
 def part_one(puzzle: Iterable[str]) -> tuple[list[int], list[int]]:
     """Solve part one of the puzzle.
 
-    >> part_one(example1.splitlines())
+    >>> part_one(example1.splitlines())
     ([35, 467, 592, 598, 617, 633, 664, 755], [58, 114])
 
-    >> sum(part_one(example1.splitlines())[0])
+    >>> sum(part_one(example1.splitlines())[0])
     4361
 
     >>> sum(part_one(open(f"2023/day{day}.in").readlines())[0])
@@ -78,10 +79,34 @@ def part_one(puzzle: Iterable[str]) -> tuple[list[int], list[int]]:
     return sorted(adj), sorted(ndj)
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
-    """Solve part two of the puzzle."""
-    result = []
-    return result
+def part_two(puzzle: Iterable[str]) -> list[tuple(int, int)]:
+    """Solve part two of the puzzle.
+
+    >>> part_two(example1.splitlines())
+    [(35, 467), (598, 755)]
+
+    >>> sum(map(lambda t: t[0] * t[1], part_two(example1.splitlines())))
+    467835
+
+    >>> sum(map(lambda t: t[0] * t[1], part_two(open(f"2023/day{day}.in").readlines())))
+    89471771
+    """
+    input, gears, nums = list(scan(puzzle)), [], {}
+    for p, s in input:
+        if not s[0].isdigit():
+            continue
+        id = uuid.uuid4()
+        for i in range(len(s)):
+            nums[Point(p.x + i, p.y)] = id, int(s)
+    for p, s in input:
+        if s != "*":
+            continue
+        ns = {nums[p] for p in p.adjacent() if p in nums}
+        if len(ns) == 2:
+            gears.append(
+                (min(ns, key=lambda t: t[1])[1], max(ns, key=lambda t: t[1])[1])
+            )
+    return gears
 
 
 def scan(puzzle: Iterable[str]) -> Iterator[tuple[Point, str]]:
