@@ -30,7 +30,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     """
     result = []
     for g1, g2 in scan(puzzle):
-        if inter := set(g1).intersection(g2):
+        if inter := g1.intersection(g2):
             result.append(2 ** (len(inter) - 1))
         else:
             result.append(0)
@@ -51,16 +51,16 @@ def part_two(puzzle: Iterable[str], n: int) -> list[int]:
     """
     cards = [1] * n
     for i, (g1, g2) in enumerate(scan(puzzle)):
-        for j in range(len(set(g1).intersection(g2))):
+        for j in range(len(g1.intersection(g2))):
             cards[i + j + 1] += cards[i]
     return cards
 
 
-def scan(puzzle: Iterable[str]) -> Iterator[tuple[list[int], list[int]]]:
+def scan(puzzle: Iterable[str]) -> Iterator[tuple[set[int], set[int]]]:
     r = re.compile(r"Card\s+\d+:(.*)\|(.*)")
     for line in puzzle:
         g1, g2 = r.match(line).groups()
-        yield ([int(x) for x in g1.split()], [int(x) for x in g2.split()])
+        yield set(map(int, g1.split())), set(map(int, g2.split()))
 
 
 def load_tests(loader, tests, ignore):
