@@ -37,19 +37,23 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     return result
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterable[str], n: int) -> list[int]:
     """Solve part two of the puzzle.
 
-    >> part_two(example2.splitlines())
-    []
+    >>> part_two(example2.splitlines(), 6)
+    [1, 2, 4, 8, 14, 1]
 
-    >> sum(part_two(example2.splitlines()))
-    0
+    >>> sum(part_two(example2.splitlines(), 6))
+    30
 
-    >> sum(part_two(open(f"2023/day{day}.in").readlines()))
-    ???
+    >>> sum(part_two(open(f"2023/day{day}.in").readlines(), 213))
+    5667240
     """
-    return []
+    cards = [1] * n
+    for i, (g1, g2) in enumerate(scan(puzzle)):
+        for j in range(len(set(g1).intersection(g2))):
+            cards[i + j + 1] += cards[i]
+    return cards
 
 
 def scan(puzzle: Iterable[str]) -> Iterator[tuple[list[int], list[int]]]:
