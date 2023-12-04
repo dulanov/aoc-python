@@ -19,8 +19,7 @@ example1 = """\
 .664.598..
 """
 
-example2 = """\
-"""
+example2 = example1
 
 
 class Point:
@@ -82,16 +81,16 @@ def part_one(puzzle: Iterable[str]) -> tuple[list[int], list[int]]:
 def part_two(puzzle: Iterable[str]) -> list[tuple(int, int)]:
     """Solve part two of the puzzle.
 
-    >>> part_two(example1.splitlines())
+    >>> part_two(example2.splitlines())
     [(35, 467), (598, 755)]
 
-    >>> sum(map(lambda t: t[0] * t[1], part_two(example1.splitlines())))
+    >>> sum(map(lambda t: t[0] * t[1], part_two(example2.splitlines())))
     467835
 
     >>> sum(map(lambda t: t[0] * t[1], part_two(open(f"2023/day{day}.in").readlines())))
     89471771
     """
-    input, gears, nums = list(scan(puzzle)), [], {}
+    input, nums, gears = list(scan(puzzle)), {}, []
     for p, s in input:
         if not s[0].isdigit():
             continue
@@ -114,7 +113,6 @@ def scan(puzzle: Iterable[str]) -> Iterator[tuple[Point, str]]:
     for y, line in enumerate(puzzle):
         for m in r.finditer(line):
             yield Point(m.start(), y), m.group()
-    return []
 
 
 def load_tests(loader, tests, ignore):

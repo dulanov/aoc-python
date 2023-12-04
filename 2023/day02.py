@@ -13,8 +13,7 @@ Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 """
 
-example2 = """\
-"""
+example2 = example1
 
 
 class RGB:
@@ -56,10 +55,10 @@ def part_one(puzzle: Iterable[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
 def part_two(puzzle: Iterable[str]) -> list[int]:
     """Solve part two of the puzzle.
 
-    >>> part_two(example1.splitlines())
+    >>> part_two(example2.splitlines())
     [48, 12, 1560, 630, 36]
 
-    >>> sum(part_two(example1.splitlines()))
+    >>> sum(part_two(example2.splitlines()))
     2286
 
     >>> sum(part_two(open(f"2023/day{day}.in").readlines()))
@@ -75,10 +74,9 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
 def scan(puzzle: Iterable[str]) -> Iterator[list[RGB]]:
     r1 = re.compile(r"Game (?:\d+): (?P<sets>.*)")
     r2 = re.compile(r"(?P<cubes>\d+) (?P<color>\w+)")
-    games = []
     for line in puzzle:
         game = []
-        for s in (r1.search(line).group("sets")).split("; "):
+        for s in (r1.match(line).group("sets")).split("; "):
             r, g, b = 0, 0, 0
             for c in r2.finditer(s):
                 if c.group("color") == "red":
@@ -88,8 +86,7 @@ def scan(puzzle: Iterable[str]) -> Iterator[list[RGB]]:
                 elif c.group("color") == "blue":
                     b = int(c.group("cubes"))
             game.append(RGB(r, g, b))
-        games.append(game)
-    return games
+        yield game
 
 
 def load_tests(loader, tests, ignore):

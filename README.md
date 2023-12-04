@@ -7,7 +7,7 @@
 All solutions can be checked with [doctest module](https://docs.python.org/3/library/doctest.html) by running the following command:
 
 ```shell
-python -m unittest discover -p *.py
+python -m doctest ./2023/dayXY.py
 ```
 
 ## Unlicense
