@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Iterable, Iterator
 import doctest
 import functools
@@ -24,11 +25,11 @@ class RGB:
         self.g = g
         self.b = b
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"RGB({self.r}, {self.g}, {self.b})"
 
     @classmethod
-    def union(cls, l, r):
+    def union(cls, l, r) -> RGB:
         return RGB(max(l.r, r.r), max(l.g, r.g), max(l.b, r.b))
 
 
