@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Iterable, Iterator
 import doctest
 import re
+import operator
 import uuid
 
 day = "03"
@@ -103,7 +104,10 @@ def part_two(puzzle: Iterable[str]) -> list[tuple(int, int)]:
         ns = {nums[p] for p in p.adjacent() if p in nums}
         if len(ns) == 2:
             gears.append(
-                (min(ns, key=lambda t: t[1])[1], max(ns, key=lambda t: t[1])[1])
+                (
+                    min(ns, key=operator.itemgetter(1))[1],
+                    max(ns, key=operator.itemgetter(1))[1],
+                )
             )
     return gears
 
