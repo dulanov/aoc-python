@@ -70,8 +70,7 @@ def part_one(puzzle: Iterable[str]) -> list[tuple[int, ...]]:
     for seed in seeds:
         path = [seed]
         for m in maps:
-            i = bisect.bisect(m, path[-1], key=operator.attrgetter("frm"))
-            r = m[i - 1] if i else Range(0, 0, 0)
+            r = m[bisect.bisect(m, path[-1], key=operator.attrgetter("frm")) - 1]
             path.append(path[-1] + r.dlt if r.frm + r.num >= path[-1] else path[-1])
         paths.append(tuple(path))
     return paths
@@ -88,7 +87,7 @@ def scan(puzzle: Iterable[str]) -> tuple[list[int], tuple[list[Range], ...]]:
         if line.startswith("seeds:"):
             seeds = list(map(int, re.findall(r"(\d+)+", line)))
         elif line.rstrip().endswith("map:"):
-            maps.append([])
+            maps.append([(0, 0, 0)])
         elif line.rstrip():
             maps[-1].append(tuple(map(int, line.split())))
     for i in range(len(maps)):
