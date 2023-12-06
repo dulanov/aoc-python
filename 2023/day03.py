@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Iterable, Iterator
+from dataclasses import dataclass
 import doctest
 import re
 import operator
@@ -23,21 +24,12 @@ example1 = """\
 example2 = example1
 
 
+@dataclass(frozen=True)
 class Point:
     """A point in the grid."""
 
-    def __init__(self, x: int, y: int):
-        self.x = x
-        self.y = y
-
-    def __eq__(self, other: Point) -> bool:
-        return self.x == other.x and self.y == other.y
-
-    def __hash__(self) -> int:
-        return hash((self.x, self.y))
-
-    def __repr__(self) -> str:
-        return f"Point({self.x}, {self.y})"
+    x: int
+    y: int
 
     def adjacent(self, ln: int = 1) -> list[Point]:
         """Return the adjacent points."""

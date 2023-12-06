@@ -1,8 +1,8 @@
+from typing import Iterable
 import bisect
-import operator
-from typing import Iterable, Iterator
 import collections
 import doctest
+import operator
 import re
 
 day = "05"
@@ -45,7 +45,7 @@ humidity-to-location map:
 
 example2 = example1
 
-Range = collections.namedtuple("Range", ["frm", "num", "dlt"])
+Map = collections.namedtuple("Map", ["fr", "to", "dlt"])
 
 
 def part_one(puzzle: Iterable[str]) -> list[tuple[int, ...]]:
@@ -66,33 +66,62 @@ def part_one(puzzle: Iterable[str]) -> list[tuple[int, ...]]:
     282277027
     """
     paths = []
-    seeds, maps = scan(puzzle)
+    seeds, levels = scan(puzzle)
     for seed in seeds:
         path = [seed]
-        for m in maps:
-            r = m[bisect.bisect(m, path[-1], key=operator.attrgetter("frm")) - 1]
-            path.append(path[-1] + r.dlt if r.frm + r.num >= path[-1] else path[-1])
+        for maps in levels:
+            m = maps[bisect.bisect(maps, path[-1], key=operator.attrgetter("fr")) - 1]
+            path.append(path[-1] + m.dlt if m.to > path[-1] else path[-1])
         paths.append(tuple(path))
     return paths
 
 
-def part_two(puzzle: Iterable[str], n: int) -> list[int]:
-    """Solve part two of the puzzle."""
-    return []
+def part_two(puzzle: Iterable[str]) -> list[int]:
+    """Solve part two of the puzzle.
+
+    >>> part_two(example1.splitlines())
+    [(46, 61), (82, 85), (86, 90), (94, 99)]
+
+    >>> part_two(example1.splitlines())[0][0]
+    46
+
+    >>> part_two(open(f"2023/day{day}.in").readlines())[0][0]
+    11554135
+    """
+    seeds, levels = scan(puzzle)
+    ranges = [(seeds[i], seeds[i] + seeds[i + 1]) for i in range(0, len(seeds), 2)]
+    for maps in levels:
+        new_ranges = []
+        for r in ranges:
+            while r[0] < r[1]:
+                idx = bisect.bisect(maps, r[0], key=operator.attrgetter("fr")) - 1
+                if (m := maps[idx]).to > r[0]:
+                    dlt, to = m.dlt, m.to
+                else:
+                    dlt, to = 0, maps[idx + 1].fr if idx + 1 < len(maps) else r[1]
+                new_ranges.append((r[0] + dlt, min(to, r[1]) + dlt))
+                r = (to, r[1])
+        ranges = []
+        for r in sorted(new_ranges, key=operator.itemgetter(0)):
+            if ranges and r[0] == ranges[-1][1]:
+                ranges[-1] = (ranges[-1][0], r[1])
+            else:
+                ranges.append(r)
+    return ranges
 
 
-def scan(puzzle: Iterable[str]) -> tuple[list[int], tuple[list[Range], ...]]:
+def scan(puzzle: Iterable[str]) -> tuple[list[int], tuple[list[Map], ...]]:
     maps = []
     for line in puzzle:
         if line.startswith("seeds:"):
             seeds = list(map(int, re.findall(r"(\d+)+", line)))
-        elif line.rstrip().endswith("map:"):
-            maps.append([(0, 0, 0)])
+        elif line.rstrip().endswith(":"):
+            maps.append([(0, 0, 0)])  # bissect requires initial value
         elif line.rstrip():
             maps[-1].append(tuple(map(int, line.split())))
-    for i in range(len(maps)):
+    for i in range(len(maps)):  # post-processing
         maps[i] = sorted(
-            map(lambda t: Range(t[1], t[2], t[0] - t[1]), maps[i]),
+            map(lambda t: Map(fr=t[1], to=t[1] + t[2], dlt=t[0] - t[1]), maps[i]),
             key=operator.itemgetter(0),
         )
     return seeds, tuple(maps)

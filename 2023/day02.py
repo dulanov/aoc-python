@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Iterable, Iterator
+from dataclasses import dataclass
 import doctest
 import functools
 import re
@@ -17,16 +18,13 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 example2 = example1
 
 
+@dataclass
 class RGB:
     """RGB color representation of sets of cubes."""
 
-    def __init__(self, r, g, b):
-        self.r = r
-        self.g = g
-        self.b = b
-
-    def __repr__(self) -> str:
-        return f"RGB({self.r}, {self.g}, {self.b})"
+    r: int
+    g: int
+    b: int
 
     @classmethod
     def union(cls, l, r) -> RGB:
