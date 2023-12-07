@@ -92,7 +92,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     result = []
     for hand in scan(puzzle):
         result.append((HandType.from_str(hand[0]), hand[0], hand[1]))
-    return sorted(result, key=lambda t: (t[0], *map("?23456789TJQKA".index, t[1])))
+    return sorted(result, key=lambda t: (t[0], *map("23456789TJQKA".index, t[1])))
 
 
 def part_two(puzzle: Iterable[str]) -> list[int]:
