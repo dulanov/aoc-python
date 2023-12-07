@@ -18,13 +18,13 @@ example2 = example1
 
 
 class HandType(Enum):
-    FIVE_KIND = auto()
-    FOUR_KIND = auto()
-    FULL_HOUSE = auto()
-    THREE_KIND = auto()
-    TWO_PAIR = auto()
-    ONE_PAIR = auto()
     HIGH_CARD = auto()
+    ONE_PAIR = auto()
+    TWO_PAIR = auto()
+    THREE_KIND = auto()
+    FULL_HOUSE = auto()
+    FOUR_KIND = auto()
+    FIVE_KIND = auto()
 
     def __lt__(self, other):
         return self.value < other.value
@@ -34,25 +34,25 @@ class HandType(Enum):
         """Return the hand type from a string.
 
         >>> HandType.from_str("AAAAA")
-        <HandType.FIVE_KIND: 1>
+        <HandType.FIVE_KIND: 7>
 
         >>> HandType.from_str("AA8AA")
-        <HandType.FOUR_KIND: 2>
+        <HandType.FOUR_KIND: 6>
 
         >>> HandType.from_str("23332")
-        <HandType.FULL_HOUSE: 3>
+        <HandType.FULL_HOUSE: 5>
 
         >>> HandType.from_str("TTT98")
         <HandType.THREE_KIND: 4>
 
         >>> HandType.from_str("23432")
-        <HandType.TWO_PAIR: 5>
+        <HandType.TWO_PAIR: 3>
 
         >>> HandType.from_str("A23A4")
-        <HandType.ONE_PAIR: 6>
+        <HandType.ONE_PAIR: 2>
 
         >>> HandType.from_str("A2345")
-        <HandType.HIGH_CARD: 7>
+        <HandType.HIGH_CARD: 1>
         """
         assert len(s) == 5
         match collections.Counter(s).most_common():
@@ -77,23 +77,22 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
 
     >>> import pprint
     >>> pprint.pprint(part_one(example1.splitlines()))
-    [(<HandType.ONE_PAIR: 6>, ('32T3K', 765)),
-     (<HandType.TWO_PAIR: 5>, ('KTJJT', 220)),
-     (<HandType.TWO_PAIR: 5>, ('KK677', 28)),
-     (<HandType.THREE_KIND: 4>, ('T55J5', 684)),
-     (<HandType.THREE_KIND: 4>, ('QQQJA', 483))]
+    [(<HandType.ONE_PAIR: 2>, '32T3K', 765),
+     (<HandType.TWO_PAIR: 3>, 'KTJJT', 220),
+     (<HandType.TWO_PAIR: 3>, 'KK677', 28),
+     (<HandType.THREE_KIND: 4>, 'T55J5', 684),
+     (<HandType.THREE_KIND: 4>, 'QQQJA', 483)]
 
-    >>> sum(map(lambda t: t[0] * t[1][1][1], enumerate(part_one(example1.splitlines()), start=1)))
+    >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_one(example1.splitlines()), start=1)))
     6440
 
-    >>> sum(map(lambda t: t[0] * t[1][1][1], enumerate(part_one(open(f"2023/day{day}.in").readlines()), start=1)))
+    >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_one(open(f"2023/day{day}.in").readlines()), start=1)))
     248422077
     """
     result = []
     for hand in scan(puzzle):
-        result.append((HandType.from_str(hand[0]), hand))
-    conv = {c: f"{i:x}" for i, c in enumerate("AKQJT98765432")}
-    return sorted(result, key=lambda t: (t[0], str2int(t[1][0], conv)), reverse=True)
+        result.append((HandType.from_str(hand[0]), hand[0], hand[1]))
+    return sorted(result, key=lambda t: (t[0], *map("?23456789TJQKA".index, t[1])))
 
 
 def part_two(puzzle: Iterable[str]) -> list[int]:
@@ -101,32 +100,27 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
 
     >>> import pprint
     >>> pprint.pprint(part_two(example1.splitlines()))
-    [(<HandType.ONE_PAIR: 6>, ('32T3K', 765)),
-     (<HandType.TWO_PAIR: 5>, ('KK677', 28)),
-     (<HandType.FOUR_KIND: 2>, ('T55J5', 684)),
-     (<HandType.FOUR_KIND: 2>, ('QQQJA', 483)),
-     (<HandType.FOUR_KIND: 2>, ('KTJJT', 220))]
+    [(<HandType.ONE_PAIR: 2>, '32T3K', 765),
+     (<HandType.TWO_PAIR: 3>, 'KK677', 28),
+     (<HandType.FOUR_KIND: 6>, 'T55J5', 684),
+     (<HandType.FOUR_KIND: 6>, 'QQQJA', 483),
+     (<HandType.FOUR_KIND: 6>, 'KTJJT', 220)]
 
-    >>> sum(map(lambda t: t[0] * t[1][1][1], enumerate(part_two(example2.splitlines()), start=1)))
+    >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_two(example2.splitlines()), start=1)))
     5905
 
-    >>> sum(map(lambda t: t[0] * t[1][1][1], enumerate(part_two(open(f"2023/day{day}.in").readlines()), start=1)))
+    >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_two(open(f"2023/day{day}.in").readlines()), start=1)))
     249817836
     """
     result = []
     for hand in scan(puzzle):
-        result.append((HandType.from_str(opt(hand[0])), hand))
-    conv = {c: f"{i:x}" for i, c in enumerate("AKQT98765432J")}
-    return sorted(result, key=lambda t: (t[0], str2int(t[1][0], conv)), reverse=True)
+        result.append((HandType.from_str(opt(hand[0])), hand[0], hand[1]))
+    return sorted(result, key=lambda t: (t[0], *map("J23456789TQKA".index, t[1])))
 
 
 def opt(hand: str) -> str:
     c = collections.Counter(hand.replace("J", ""))
     return hand.replace("J", c.most_common()[0][0] if c else "J")
-
-
-def str2int(s: str, conv: map[str, str]) -> int:
-    return int("".join([conv[c] for c in s]), 16)
 
 
 def scan(puzzle: Iterable[str]) -> Iterator[tuple[int, str]]:
