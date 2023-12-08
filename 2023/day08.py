@@ -1,11 +1,12 @@
 from typing import Iterable
 import doctest
 import itertools
+import math
 import re
 
 day = "08"
 
-example1 = """\
+example11 = """\
 RL
 
 AAA = (BBB, CCC)
@@ -17,7 +18,7 @@ GGG = (GGG, GGG)
 ZZZ = (ZZZ, ZZZ)
 """
 
-example2 = """\
+example12 = """\
 LLR
 
 AAA = (BBB, BBB)
@@ -25,20 +26,33 @@ BBB = (AAA, ZZZ)
 ZZZ = (ZZZ, ZZZ)
 """
 
+example2 = """\
+LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)
+"""
+
 
 def part_one(puzzle: Iterable[str]) -> list[int]:
     """Solve part one of the puzzle.
 
-    >>> part_one(example1.splitlines())
+    >>> part_one(example11.splitlines())
     ['AAA', 'CCC', 'ZZZ']
 
-    >>> len(part_one(example1.splitlines())) - 1
+    >>> len(part_one(example11.splitlines())) - 1
     2
 
-    >>> part_one(example2.splitlines())
+    >>> part_one(example12.splitlines())
     ['AAA', 'BBB', 'AAA', 'BBB', 'AAA', 'BBB', 'ZZZ']
 
-    >>> len(part_one(example2.splitlines())) - 1
+    >>> len(part_one(example12.splitlines())) - 1
     6
 
     >>> len(part_one(open(f"2023/day{day}.in").readlines())) - 1
@@ -56,16 +70,25 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
 def part_two(puzzle: Iterable[str]) -> list[int]:
     """Solve part two of the puzzle.
 
-    >>> part_two(example1.splitlines())
-    []
+    >>> part_two(example2.splitlines())
+    [2, 3]
 
-    >>> sum(part_two(example2.splitlines()))
-    0
+    >>> math.lcm(*part_two(example2.splitlines()))
+    6
 
-    >> sum(part_two(open(f"2023/day{day}.in").readlines()))
-    ???
+    >>> math.lcm(*part_two(open(f"2023/day{day}.in").readlines()))
+    13385272668829
     """
-    return []
+    ins, nodes = scan(puzzle)
+    nodes, ns = {n[0]: n[1:] for n in nodes}, []
+    for node in [k for k in nodes.keys() if k.endswith("A")]:
+        ns.append(0)
+        for i in itertools.cycle(ins):
+            if node.endswith("Z"):
+                break
+            node = nodes[node][i]
+            ns[-1] += 1
+    return ns
 
 
 def scan(puzzle: Iterable[str]) -> tuple[list[int], list[tuple[str, str, str]]]:
