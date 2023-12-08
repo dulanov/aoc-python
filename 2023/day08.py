@@ -1,7 +1,6 @@
 from typing import Iterable
 import doctest
 import itertools
-import math
 import re
 
 day = "08"
@@ -73,6 +72,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> part_two(example2.splitlines())
     [2, 3]
 
+    >>> import math
     >>> math.lcm(*part_two(example2.splitlines()))
     6
 
@@ -82,12 +82,11 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     ins, nodes = scan(puzzle)
     nodes, ns = {n[0]: n[1:] for n in nodes}, []
     for node in [k for k in nodes.keys() if k.endswith("A")]:
-        ns.append(0)
-        for i in itertools.cycle(ins):
+        for i, j in enumerate(itertools.cycle(ins)):
             if node.endswith("Z"):
+                ns.append(i)
                 break
-            node = nodes[node][i]
-            ns[-1] += 1
+            node = nodes[node][j]
     return ns
 
 
