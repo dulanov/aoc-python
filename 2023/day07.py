@@ -99,7 +99,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> import pprint
-    >>> pprint.pprint(part_two(example1.splitlines()))
+    >>> pprint.pprint(part_two(example2.splitlines()))
     [(<HandType.ONE_PAIR: 2>, '32T3K', 765),
      (<HandType.TWO_PAIR: 3>, 'KK677', 28),
      (<HandType.FOUR_KIND: 6>, 'T55J5', 684),
