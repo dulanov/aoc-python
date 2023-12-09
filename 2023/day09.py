@@ -44,6 +44,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> part_two(example2.splitlines())
     [(3, -3), (1, 1, 0), (2, -2, 5, 5)]
 
+    >>> import operator
     >>> sum(map(operator.itemgetter(-1), part_two(example2.splitlines())))
     2
 
