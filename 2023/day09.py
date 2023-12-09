@@ -1,6 +1,7 @@
-import itertools
 from typing import Iterable, Iterator
 import doctest
+import itertools
+import operator
 
 day = "09"
 
@@ -41,15 +42,22 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
-    []
+    [(3, -3), (1, 1, 0), (2, -2, 5, 5)]
 
-    >>> len(part_two(example2.splitlines()))
-    0
+    >>> sum(map(operator.itemgetter(-1), part_two(example2.splitlines())))
+    2
 
-    >> len(part_two(open(f"2023/day{day}.in").readlines()))
-    ???
+    >>> sum(map(operator.itemgetter(-1), part_two(open(f"2023/day{day}.in").readlines())))
+    928
     """
-    return []
+    result = []
+    for ns in scan(puzzle):
+        lasts = []
+        while any(ns):
+            lasts.append(ns[0])
+            ns = [n2 - n1 for n1, n2 in itertools.pairwise(ns)]
+        result.append(tuple(itertools.accumulate(reversed(lasts), lambda a, b: b - a)))
+    return result
 
 
 def scan(puzzle: Iterable[str]) -> Iterator[list[int]]:
