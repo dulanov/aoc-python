@@ -1,7 +1,7 @@
 from __future__ import annotations
-import collections
 from enum import Enum, auto
 from typing import Iterable, Iterator
+import collections
 import doctest
 
 day = "07"
