@@ -22,7 +22,43 @@ SJLL7
 LJ.LJ
 """
 
-example2 = example11
+example21 = """\
+...........
+.S-------7.
+.|F-----7|.
+.||.....||.
+.||.....||.
+.|L-7.F-J|.
+.|..|.|..|.
+.L--J.L--J.
+...........
+"""
+
+example22 = """\
+.F----7F7F7F7F-7....
+.|F--7||||||||FJ....
+.||.FJ||||||||L7....
+FJL7L7LJLJ||LJ.L-7..
+L--J.L7...LJS7F-7L7.
+....F-J..F7FJ|L7L7L7
+....L7.F7||L7|.L7L7|
+.....|FJLJ|FJ|F7|.LJ
+....FJL-7.||.||||...
+....L---J.LJ.LJLJ...
+"""
+
+example23 = """\
+FF7FSF7F7F7F7F7F---7
+L|LJ||||||||||||F--J
+FL-7LJLJ||||||LJL-77
+F--JF--7||LJLJ7F7FJ-
+L---JF-JLJ.||-FJLJJ7
+|F|F-JF---7F7-L7L|7|
+|FFJF7L7F-JF7|JL---7
+7-L-JL7||F7|L7F-7F7|
+L.L7LFJ|||||FJL7||LJ
+L7JLJL-JLJLJL--JLJ.L
+"""
 
 
 class Dir(Enum):
@@ -112,38 +148,40 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
 
     >>> import pprint
     >>> pprint.pprint(part_one(example11.splitlines()))
-    [<Dir.E: 2>,
-     <Dir.S: 3>,
-     <Dir.S: 3>,
-     <Dir.W: 4>,
-     <Dir.W: 4>,
-     <Dir.N: 1>,
-     <Dir.N: 1>]
+    [(1, 1, <Dir.E: 2>),
+     (2, 1, <Dir.E: 2>),
+     (3, 1, <Dir.S: 3>),
+     (3, 2, <Dir.S: 3>),
+     (3, 3, <Dir.W: 4>),
+     (2, 3, <Dir.W: 4>),
+     (1, 3, <Dir.N: 1>),
+     (1, 2, <Dir.N: 1>)]
 
-    >>> (len(part_one(example11.splitlines())) + 1) // 2
+    >>> len(part_one(example11.splitlines())) // 2
     4
 
     >>> pprint.pprint(part_one(example12.splitlines()))
-    [<Dir.N: 1>,
-     <Dir.E: 2>,
-     <Dir.N: 1>,
-     <Dir.E: 2>,
-     <Dir.S: 3>,
-     <Dir.S: 3>,
-     <Dir.E: 2>,
-     <Dir.S: 3>,
-     <Dir.W: 4>,
-     <Dir.W: 4>,
-     <Dir.W: 4>,
-     <Dir.S: 3>,
-     <Dir.W: 4>,
-     <Dir.N: 1>,
-     <Dir.N: 1>]
+    [(0, 2, <Dir.E: 2>),
+     (1, 2, <Dir.N: 1>),
+     (1, 1, <Dir.E: 2>),
+     (2, 1, <Dir.N: 1>),
+     (2, 0, <Dir.E: 2>),
+     (3, 0, <Dir.S: 3>),
+     (3, 1, <Dir.S: 3>),
+     (3, 2, <Dir.E: 2>),
+     (4, 2, <Dir.S: 3>),
+     (4, 3, <Dir.W: 4>),
+     (3, 3, <Dir.W: 4>),
+     (2, 3, <Dir.W: 4>),
+     (1, 3, <Dir.S: 3>),
+     (1, 4, <Dir.W: 4>),
+     (0, 4, <Dir.N: 1>),
+     (0, 3, <Dir.N: 1>)]
 
-    >>> (len(part_one(example12.splitlines())) + 1) // 2
+    >>> len(part_one(example12.splitlines())) // 2
     8
 
-    >>> (len(part_one(open(f"2023/day{day}.in").readlines())) + 1) // 2
+    >>> len(part_one(open(f"2023/day{day}.in").readlines())) // 2
     6599
     """
     grid, x, y = [], 0, 0
@@ -165,26 +203,65 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
 def part_two(puzzle: Iterable[str]) -> list[int]:
     """Solve part two of the puzzle.
 
-    >>> part_two(example2.splitlines())
-    []
+    >>> part_two(example21.splitlines())
+    [(2, 6), (3, 6), (7, 6), (8, 6)]
 
-    >>> len(part_two(example2.splitlines()))
-    0
+    >>> len(part_two(example21.splitlines()))
+    4
 
-    >> len(part_two(open(f"2023/day{day}.in").readlines()))
-    ???
+    >>> part_two(example22.splitlines())
+    [(14, 3), (7, 4), (8, 4), (9, 4), (7, 5), (8, 5), (6, 6), (14, 6)]
+
+    >>> len(part_two(example22.splitlines()))
+    8
+
+    >>> part_two(example23.splitlines())
+    [(14, 3), (10, 4), (11, 4), (12, 4), (13, 4), (11, 5), (12, 5), (13, 5), (13, 6), (14, 6)]
+
+    >>> len(part_two(example23.splitlines()))
+    10
+
+    >>> len(part_two(open(f"2023/day{day}.in").readlines()))
+    477
     """
-    return []
+    grid, x, y = [], 0, 0
+    for i, tiles in enumerate(scan(puzzle)):
+        if Tile.STRT in tiles:
+            x, y = tiles.index(Tile.STRT), i
+        grid.append(tiles)
+    for d in [Dir.N, Dir.E, Dir.S, Dir.W]:
+        try:
+            dx, dy = d.dlt()
+            grid[y + dy][x + dx].other(d)
+        except ValueError:
+            continue
+        else:
+            break
+    enclosed_tiles = []
+    loop = {(x, y): d for x, y, d in iter(grid, x, y, d)}
+    for y in range(len(grid)):
+        winding_number = 0  # https://en.wikipedia.org/wiki/Nonzero-rule
+        for x in range(len(grid[y])):
+            if (x, y) in loop and (x, y + 1) in loop:
+                if loop[x, y + 1] == Dir.N:
+                    winding_number += 1
+                elif loop[x, y] == Dir.S:
+                    winding_number -= 1
+            if (x, y) not in loop and winding_number != 0:
+                enclosed_tiles.append((x, y))
+    return enclosed_tiles
 
 
-def iter(grid: list[list[Tile]], x: int, y: int, d: Dir) -> Iterator[Dir]:
+def iter(
+    grid: list[list[Tile]], x: int, y: int, d: Dir
+) -> Iterator[tuple[int, int, Dir]]:
     while True:
+        yield x, y, d
         dx, dy = d.dlt()
         x, y = x + dx, y + dy
         if grid[y][x] == Tile.STRT:
             break
         d = grid[y][x].other(d)
-        yield d
 
 
 def scan(puzzle: Iterable[str]) -> Iterator[list[Tile]]:
