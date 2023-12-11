@@ -1,5 +1,5 @@
 from __future__ import annotations
-from enum import Enum, auto
+from enum import Enum
 from typing import Iterable, Iterator
 import doctest
 
@@ -62,85 +62,38 @@ L7JLJL-JLJLJL--JLJ.L
 
 
 class Dir(Enum):
-    N = auto()
-    E = auto()
-    S = auto()
-    W = auto()
+    N, E, S, W = ((0, -1), "S"), ((1, 0), "W"), ((0, 1), "N"), ((-1, 0), "E")
 
-    def dlt(self) -> tuple[int, int]:
-        match self:
-            case Dir.N:
-                return (0, -1)
-            case Dir.E:
-                return (1, 0)
-            case Dir.S:
-                return (0, 1)
-            case Dir.W:
-                return (-1, 0)
+    def __call__(self, x: int, y: int) -> tuple[int, int]:
+        dx, dy = self.value[0]
+        return x + dx, y + dy
+
+    def __repr__(self) -> str:
+        return self.name
 
     def inv(self) -> Dir:
-        match self:
-            case Dir.N:
-                return Dir.S
-            case Dir.E:
-                return Dir.W
-            case Dir.S:
-                return Dir.N
-            case Dir.W:
-                return Dir.E
+        return Dir[self.value[1]]
 
 
 class Tile(Enum):
-    NSPIPE = auto()
-    WEPIPE = auto()
-    NEPIPE = auto()
-    NWPIPE = auto()
-    WSPIPE = auto()
-    ESPIPE = auto()
-    STRT = auto()
-    GND = auto()
-
-    def dirs(self) -> tuple(Dir, Dir):
-        match self:
-            case Tile.NSPIPE:
-                return (Dir.N, Dir.S)
-            case Tile.WEPIPE:
-                return (Dir.W, Dir.E)
-            case Tile.NEPIPE:
-                return (Dir.N, Dir.E)
-            case Tile.NWPIPE:
-                return (Dir.N, Dir.W)
-            case Tile.WSPIPE:
-                return (Dir.W, Dir.S)
-            case Tile.ESPIPE:
-                return (Dir.E, Dir.S)
-        raise ValueError(f"{self} not supported")
+    NSPIPE = ("|", Dir.N, Dir.S)
+    WEPIPE = ("-", Dir.W, Dir.E)
+    NEPIPE = ("L", Dir.N, Dir.E)
+    NWPIPE = ("J", Dir.N, Dir.W)
+    WSPIPE = ("7", Dir.W, Dir.S)
+    ESPIPE = ("F", Dir.E, Dir.S)
+    STRT = ("S", None, None)
+    GND = (".", None, None)
 
     def other(self, d: Dir) -> Dir:
-        d1, d2 = self.dirs()
+        d1, d2 = self.value[1], self.value[2]
         if d.inv() != d1 and d.inv() != d2:
             raise ValueError(f"{d} not supported by {self}")
         return d1 if d.inv() == d2 else d2
 
     @classmethod
     def from_str(cls, s: str) -> Tile:
-        match s:
-            case "|":
-                return Tile.NSPIPE
-            case "-":
-                return Tile.WEPIPE
-            case "L":
-                return Tile.NEPIPE
-            case "J":
-                return Tile.NWPIPE
-            case "7":
-                return Tile.WSPIPE
-            case "F":
-                return Tile.ESPIPE
-            case "S":
-                return Tile.STRT
-            case ".":
-                return Tile.GND
+        return next(t for t in cls if s == t.value[0])
 
 
 def part_one(puzzle: Iterable[str]) -> list[int]:
@@ -148,35 +101,35 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
 
     >>> import pprint
     >>> pprint.pprint(part_one(example11.splitlines()))
-    [(1, 1, <Dir.E: 2>),
-     (2, 1, <Dir.E: 2>),
-     (3, 1, <Dir.S: 3>),
-     (3, 2, <Dir.S: 3>),
-     (3, 3, <Dir.W: 4>),
-     (2, 3, <Dir.W: 4>),
-     (1, 3, <Dir.N: 1>),
-     (1, 2, <Dir.N: 1>)]
+    [(1, 1, E),
+     (2, 1, E),
+     (3, 1, S),
+     (3, 2, S),
+     (3, 3, W),
+     (2, 3, W),
+     (1, 3, N),
+     (1, 2, N)]
 
     >>> len(part_one(example11.splitlines())) // 2
     4
 
     >>> pprint.pprint(part_one(example12.splitlines()))
-    [(0, 2, <Dir.E: 2>),
-     (1, 2, <Dir.N: 1>),
-     (1, 1, <Dir.E: 2>),
-     (2, 1, <Dir.N: 1>),
-     (2, 0, <Dir.E: 2>),
-     (3, 0, <Dir.S: 3>),
-     (3, 1, <Dir.S: 3>),
-     (3, 2, <Dir.E: 2>),
-     (4, 2, <Dir.S: 3>),
-     (4, 3, <Dir.W: 4>),
-     (3, 3, <Dir.W: 4>),
-     (2, 3, <Dir.W: 4>),
-     (1, 3, <Dir.S: 3>),
-     (1, 4, <Dir.W: 4>),
-     (0, 4, <Dir.N: 1>),
-     (0, 3, <Dir.N: 1>)]
+    [(0, 2, E),
+     (1, 2, N),
+     (1, 1, E),
+     (2, 1, N),
+     (2, 0, E),
+     (3, 0, S),
+     (3, 1, S),
+     (3, 2, E),
+     (4, 2, S),
+     (4, 3, W),
+     (3, 3, W),
+     (2, 3, W),
+     (1, 3, S),
+     (1, 4, W),
+     (0, 4, N),
+     (0, 3, N)]
 
     >>> len(part_one(example12.splitlines())) // 2
     8
@@ -184,20 +137,20 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> len(part_one(open(f"2023/day{day}.in").readlines())) // 2
     6599
     """
-    grid, x, y = [], 0, 0
+    grid = []
     for i, tiles in enumerate(scan(puzzle)):
         if Tile.STRT in tiles:
-            x, y = tiles.index(Tile.STRT), i
+            sx, sy = tiles.index(Tile.STRT), i
         grid.append(tiles)
     for d in [Dir.N, Dir.E, Dir.S, Dir.W]:
         try:
-            dx, dy = d.dlt()
-            grid[y + dy][x + dx].other(d)
+            x, y = d(sx, sy)
+            grid[y][x].other(d)
         except ValueError:
             continue
         else:
             break
-    return list(iter(grid, x, y, d))
+    return list(iter(grid, sx, sy, d))
 
 
 def part_two(puzzle: Iterable[str]) -> list[int]:
@@ -224,32 +177,31 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> len(part_two(open(f"2023/day{day}.in").readlines()))
     477
     """
-    grid, x, y = [], 0, 0
+    grid = []
     for i, tiles in enumerate(scan(puzzle)):
         if Tile.STRT in tiles:
-            x, y = tiles.index(Tile.STRT), i
+            sx, sy = tiles.index(Tile.STRT), i
         grid.append(tiles)
     for d in [Dir.N, Dir.E, Dir.S, Dir.W]:
         try:
-            dx, dy = d.dlt()
-            grid[y + dy][x + dx].other(d)
+            x, y = d(sx, sy)
+            grid[y][x].other(d)
         except ValueError:
             continue
         else:
             break
-    enclosed_tiles = []
-    loop = {(x, y): d for x, y, d in iter(grid, x, y, d)}
+    enclosed, loop = [], {(x, y): d for x, y, d in iter(grid, sx, sy, d)}
     for y in range(len(grid)):
-        winding_number = 0  # https://en.wikipedia.org/wiki/Nonzero-rule
+        winding = 0  # https://en.wikipedia.org/wiki/Nonzero-rule
         for x in range(len(grid[y])):
             if (x, y) in loop and (x, y + 1) in loop:
                 if loop[x, y + 1] == Dir.N:
-                    winding_number += 1
+                    winding += 1
                 elif loop[x, y] == Dir.S:
-                    winding_number -= 1
-            if (x, y) not in loop and winding_number != 0:
-                enclosed_tiles.append((x, y))
-    return enclosed_tiles
+                    winding -= 1
+            if (x, y) not in loop and winding:
+                enclosed.append((x, y))
+    return enclosed
 
 
 def iter(
@@ -257,8 +209,7 @@ def iter(
 ) -> Iterator[tuple[int, int, Dir]]:
     while True:
         yield x, y, d
-        dx, dy = d.dlt()
-        x, y = x + dx, y + dy
+        x, y = d(x, y)
         if grid[y][x] == Tile.STRT:
             break
         d = grid[y][x].other(d)
