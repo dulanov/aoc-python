@@ -1,7 +1,7 @@
 from typing import Iterable, Iterator
 import doctest
 import functools
-import operator
+import itertools
 
 day = "12"
 
@@ -30,85 +30,61 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_one(open(f"2023/day{day}.in").readlines()))
     6958
     """
-    result = []
-    for pattern, groups in scan(puzzle):
-        result.append(len(arrange(pattern, *groups)))
-    return result
+    return [arrange(pattern, *groups) for pattern, groups in scan(puzzle)]
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterable[str], copies: int = 5) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
-    []
+    [1, 16384, 1, 16, 2500, 506250]
 
     >>> sum(part_two(example2.splitlines()))
-    0
+    525152
 
-    >> sum(part_two(open(f"2023/day{day}.in").readlines()))
-    ???
+    >>> sum(part_two(open(f"2023/day{day}.in").readlines()))
+    6555315065024
     """
-    return []
+    result = []
+    for pattern, groups in scan(puzzle):
+        pattern = "?".join(itertools.repeat(pattern, copies))
+        result.append(arrange(pattern, *(groups * copies)))
+    return result
 
 
-def arrange(pattern: str, *groups: list[int]) -> list[str]:
+@functools.cache
+def arrange(pattern: str, *groups: list[int]) -> int:
     """Found all possible arrangements of a pattern.
 
-    >>> import pprint
-    >>> pprint.pprint(arrange("???.###", 1, 1, 3))
-    ['#.#.###']
+    >>> arrange("???.###", 1, 1, 3)
+    1
 
-    >>> pprint.pprint(arrange(".??..??...?##.", 1, 1, 3))
-    ['.#...#....###.', '.#....#...###.', '..#..#....###.', '..#...#...###.']
+    >>> arrange(".??..??...?##.", 1, 1, 3)
+    4
 
-    >>> pprint.pprint(arrange("?#?#?#?#?#?#?#?", 1, 3, 1, 6))
-    ['.#.###.#.######']
+    >>> arrange("?#?#?#?#?#?#?#?", 1, 3, 1, 6)
+    1
 
-    >>> pprint.pprint(arrange("????.#...#...", 4, 1, 1))
-    ['####.#...#...']
+    >>> arrange("????.#...#...", 4, 1, 1)
+    1
 
-    >>> pprint.pprint(arrange("????.######..#####.", 1, 6, 5))
-    ['#....######..#####.',
-     '.#...######..#####.',
-     '..#..######..#####.',
-     '...#.######..#####.']
+    >>> arrange("????.######..#####.", 1, 6, 5)
+    4
 
-    >>> pprint.pprint(arrange("?###????????", 3, 2, 1))
-    ['.###.##.#...',
-     '.###.##..#..',
-     '.###.##...#.',
-     '.###.##....#',
-     '.###..##.#..',
-     '.###..##..#.',
-     '.###..##...#',
-     '.###...##.#.',
-     '.###...##..#',
-     '.###....##.#']
+    >>> arrange("?###????????", 3, 2, 1)
+    10
     """
-    stack = ([], [(pattern + ".", 0)])
-    for i, n in enumerate(groups):
-        stack = stack[1], []
-        ln = sum(groups[i:]) + len(groups[i:])
-        for rec, pos in stack[0]:
-            if len(rec) - pos < ln:
-                continue
-            for j in range(pos, len(rec) - ln + 1):
-                if is_group(rec[j : j + n + 1]):
-                    fst, grp, lst = rec[:pos], group(n, j - pos), rec[j + n + 1 :]
-                    if i == len(groups) - 1:
-                        if "#" in lst:
-                            if rec[j] == "#":
-                                break
-                            continue
-                        lst = lst.replace("?", ".")
-                    stack[1].append((fst + grp + lst, j + n + 1))
-                if rec[j] == "#":
-                    break
-    return list(map(lambda t: t[0][:-1], stack[1]))
-
-
-def group(n, m: int) -> str:
-    return "." * m + "#" * n + "."
+    if not groups:
+        return 0 if "#" in pattern else 1
+    cnt, ln, pattern = 0, groups[0], pattern + "."
+    if (min := sum(groups) + len(groups)) > len(pattern):
+        return 0
+    for offset in range(len(pattern) - min + 1):
+        if is_group(pattern[offset : offset + ln + 1]):
+            cnt += arrange(pattern[offset + ln + 1 :], *groups[1:])
+        if pattern[offset] == "#":
+            break
+    return cnt
 
 
 def is_group(pattern: str) -> bool:
