@@ -79,10 +79,10 @@ def part_two(puzzle: Iterable[str], copies: int = 5) -> list[int]:
 
 
 def reflected(ns: list[int], pos: int, bits: int = 0) -> bool:
-    diff = 0
     for i in range(min(pos, len(ns) - pos)):
-        diff += ns[pos - i - 1] ^ ns[pos + i]
-    return diff.bit_count() == bits
+        if d := ns[pos - i - 1] ^ ns[pos + i]:
+            bits -= d.bit_count()
+    return bits == 0
 
 
 def transpose(pattern: list[list[bool]]) -> list[list[bool]]:
