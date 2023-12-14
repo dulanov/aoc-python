@@ -83,8 +83,8 @@ def tilt(g: Grid, n: int, /, *, d: Dir = Dir.N) -> None:
     for x in range(1, n - 1):
         cubes, new_cubes, lo = g.cube_xs[x], [], 0
         for r1, r2 in itertools.pairwise(g.rock_xs[x]):
-            i = bisect.bisect_left(cubes, r1, lo)
-            lo = bisect.bisect_left(cubes, r2, i)
+            lo = bisect.bisect_left(cubes, r1, lo)
+            lo = bisect.bisect_left(cubes, r2, lo)
             new_cubes += [Pos(r1.x, r1.y + i + 1) for i in range(lo - i)]
         g.cube_xs[x] = new_cubes
     g.cube_ys.clear()
