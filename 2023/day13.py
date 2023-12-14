@@ -28,10 +28,10 @@ example2 = example1
 def part_one(puzzle: Iterable[str]) -> list[int]:
     """Solve part one of the puzzle.
 
-    >> part_one(example1.splitlines())
+    >>> part_one(example1.splitlines())
     [(5, 0), (0, 4)]
 
-    >> sum(map(lambda t: t[0] + t[1] * 100, part_one(example1.splitlines())))
+    >>> sum(map(lambda t: t[0] + t[1] * 100, part_one(example1.splitlines())))
     405
 
     >>> sum(map(lambda t: t[0] + t[1] * 100, part_one(open(f"2023/day{day}.in"))))
@@ -62,7 +62,7 @@ def part_two(puzzle: Iterable[str], copies: int = 5) -> list[int]:
     >>> sum(map(lambda t: t[0] + t[1] * 100, part_two(example2.splitlines())))
     400
 
-    >> sum(map(lambda t: t[0] + t[1] * 100, part_two(open(f"2023/day{day}.in"))))
+    >>> sum(map(lambda t: t[0] + t[1] * 100, part_two(open(f"2023/day{day}.in"))))
     28475
     """
     result = []
