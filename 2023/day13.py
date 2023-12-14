@@ -1,4 +1,4 @@
-from typing import Callable, Iterable, Iterator
+from typing import Iterable, Iterator
 import doctest
 
 day = "13"
