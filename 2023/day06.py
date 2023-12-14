@@ -24,7 +24,7 @@ def part_one(puzzle: Iterable[str]) -> list[tuple[int, int]]:
     >>> functools.reduce(operator.mul, list(map(lambda t: t[1] - t[0], part_one(example1.splitlines()))))
     288
 
-    >>> functools.reduce(operator.mul, list(map(lambda t: t[1] - t[0], part_one(open(f"2023/day{day}.in").readlines()))))
+    >>> functools.reduce(operator.mul, list(map(lambda t: t[1] - t[0], part_one(open(f"2023/day{day}.in")))))
     220320
     """
     wins = []
@@ -44,7 +44,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> -functools.reduce(operator.sub, part_two(example1.splitlines()))
     71503
 
-    >>> -functools.reduce(operator.sub, part_two(open(f"2023/day{day}.in").readlines()))
+    >>> -functools.reduce(operator.sub, part_two(open(f"2023/day{day}.in")))
     34454850
     """
     return solve(*scan(puzzle, collapsed=True)[0])

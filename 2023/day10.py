@@ -134,7 +134,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> len(part_one(example12.splitlines())) // 2
     8
 
-    >>> len(part_one(open(f"2023/day{day}.in").readlines())) // 2
+    >>> len(part_one(open(f"2023/day{day}.in"))) // 2
     6599
     """
     grid = []
@@ -174,7 +174,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> len(part_two(example23.splitlines()))
     10
 
-    >>> len(part_two(open(f"2023/day{day}.in").readlines()))
+    >>> len(part_two(open(f"2023/day{day}.in")))
     477
     """
     grid = []

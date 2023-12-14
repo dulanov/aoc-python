@@ -56,7 +56,7 @@ def part_one(puzzle: Iterable[str]) -> tuple[list[int], list[int]]:
     >>> sum(part_one(example1.splitlines())[0])
     4361
 
-    >>> sum(part_one(open(f"2023/day{day}.in").readlines())[0])
+    >>> sum(part_one(open(f"2023/day{day}.in"))[0])
     556367
     """
     input, adj, ndj = list(scan(puzzle)), [], []
@@ -80,7 +80,7 @@ def part_two(puzzle: Iterable[str]) -> list[tuple(int, int)]:
     >>> sum(map(lambda t: t[0] * t[1], part_two(example2.splitlines())))
     467835
 
-    >>> sum(map(lambda t: t[0] * t[1], part_two(open(f"2023/day{day}.in").readlines())))
+    >>> sum(map(lambda t: t[0] * t[1], part_two(open(f"2023/day{day}.in"))))
     89471771
     """
     input, nums, gears = list(scan(puzzle)), {}, []

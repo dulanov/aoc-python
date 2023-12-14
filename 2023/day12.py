@@ -27,7 +27,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_one(example1.splitlines()))
     21
 
-    >>> sum(part_one(open(f"2023/day{day}.in").readlines()))
+    >>> sum(part_one(open(f"2023/day{day}.in")))
     6958
     """
     return [arrange(pattern, *groups) for pattern, groups in scan(puzzle)]
@@ -42,7 +42,7 @@ def part_two(puzzle: Iterable[str], copies: int = 5) -> list[int]:
     >>> sum(part_two(example2.splitlines()))
     525152
 
-    >>> sum(part_two(open(f"2023/day{day}.in").readlines()))
+    >>> sum(part_two(open(f"2023/day{day}.in")))
     6555315065024
     """
     result = []

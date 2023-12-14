@@ -25,7 +25,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_one(example1.splitlines()))
     13
 
-    >>> sum(part_one(open(f"2023/day{day}.in").readlines()))
+    >>> sum(part_one(open(f"2023/day{day}.in")))
     25183
     """
     result = []
@@ -46,7 +46,7 @@ def part_two(puzzle: Iterable[str], n: int) -> list[int]:
     >>> sum(part_two(example2.splitlines(), 6))
     30
 
-    >>> sum(part_two(open(f"2023/day{day}.in").readlines(), 213))
+    >>> sum(part_two(open(f"2023/day{day}.in"), 213))
     5667240
     """
     cards = [1] * n

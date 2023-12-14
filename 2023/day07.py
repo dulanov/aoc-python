@@ -86,7 +86,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_one(example1.splitlines()), start=1)))
     6440
 
-    >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_one(open(f"2023/day{day}.in").readlines()), start=1)))
+    >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_one(open(f"2023/day{day}.in")), start=1)))
     248422077
     """
     result = []
@@ -109,7 +109,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_two(example2.splitlines()), start=1)))
     5905
 
-    >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_two(open(f"2023/day{day}.in").readlines()), start=1)))
+    >>> sum(map(lambda t: t[0] * t[1][2], enumerate(part_two(open(f"2023/day{day}.in")), start=1)))
     249817836
     """
     result = []

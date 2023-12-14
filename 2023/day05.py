@@ -62,7 +62,7 @@ def part_one(puzzle: Iterable[str]) -> list[tuple[int, ...]]:
     >>> min(map(operator.itemgetter(-1), part_one(example1.splitlines())))
     35
 
-    >>> min(map(operator.itemgetter(-1), part_one(open(f"2023/day{day}.in").readlines())))
+    >>> min(map(operator.itemgetter(-1), part_one(open(f"2023/day{day}.in"))))
     282277027
     """
     paths = []
@@ -85,7 +85,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> part_two(example1.splitlines())[0][0]
     46
 
-    >>> part_two(open(f"2023/day{day}.in").readlines())[0][0]
+    >>> part_two(open(f"2023/day{day}.in"))[0][0]
     11554135
     """
     seeds, levels = scan(puzzle)

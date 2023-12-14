@@ -40,7 +40,7 @@ def part_one(puzzle: Iterable[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
     >>> sum(part_one(example1.splitlines()))
     8
 
-    >>> sum(part_one(open(f"2023/day{day}.in").readlines()))
+    >>> sum(part_one(open(f"2023/day{day}.in")))
     2101
     """
     result = []
@@ -60,7 +60,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_two(example2.splitlines()))
     2286
 
-    >>> sum(part_two(open(f"2023/day{day}.in").readlines()))
+    >>> sum(part_two(open(f"2023/day{day}.in")))
     58269
     """
     result = []

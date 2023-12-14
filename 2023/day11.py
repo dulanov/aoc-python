@@ -31,7 +31,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> sum(part_one(example1.splitlines()))
     374
 
-    >>> sum(part_one(open(f"2023/day{day}.in").readlines()))
+    >>> sum(part_one(open(f"2023/day{day}.in")))
     9233514
     """
     galaxies = set(chain.from_iterable(scan(puzzle)))
@@ -52,7 +52,7 @@ def part_two(puzzle: Iterable[str], factor: int = 1000000) -> list[int]:
     >>> sum(part_two(example2.splitlines(), factor=100))
     8410
 
-    >>> sum(part_two(open(f"2023/day{day}.in").readlines()))
+    >>> sum(part_two(open(f"2023/day{day}.in")))
     363293506944
     """
     galaxies = set(chain.from_iterable(scan(puzzle)))

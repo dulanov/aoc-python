@@ -34,7 +34,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >> sum(map(lambda t: t[0] + t[1] * 100, part_one(example1.splitlines())))
     405
 
-    >>> sum(map(lambda t: t[0] + t[1] * 100, part_one(open(f"2023/day{day}.in").readlines())))
+    >>> sum(map(lambda t: t[0] + t[1] * 100, part_one(open(f"2023/day{day}.in"))))
     33356
     """
     result = []
@@ -62,18 +62,18 @@ def part_two(puzzle: Iterable[str], copies: int = 5) -> list[int]:
     >>> sum(map(lambda t: t[0] + t[1] * 100, part_two(example2.splitlines())))
     400
 
-    >> sum(map(lambda t: t[0] + t[1] * 100, part_two(open(f"2023/day{day}.in").readlines())))
+    >> sum(map(lambda t: t[0] + t[1] * 100, part_two(open(f"2023/day{day}.in"))))
     28475
     """
     result = []
     for pattern in scan(puzzle):
         cols = fold(transpose(pattern))
         for i in range(1, len(cols)):
-            if reflected(cols, i, 1):
+            if reflected(cols, i, bits=1):
                 result.append((i, 0))
         rows = fold(pattern)
         for i in range(1, len(rows)):
-            if reflected(rows, i, 1):
+            if reflected(rows, i, bits=1):
                 result.append((0, i))
     return result
 

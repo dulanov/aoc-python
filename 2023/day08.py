@@ -54,7 +54,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> len(part_one(example12.splitlines())) - 1
     6
 
-    >>> len(part_one(open(f"2023/day{day}.in").readlines())) - 1
+    >>> len(part_one(open(f"2023/day{day}.in"))) - 1
     12083
     """
     ins, nodes = scan(puzzle)
@@ -76,7 +76,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     >>> math.lcm(*part_two(example2.splitlines()))
     6
 
-    >>> math.lcm(*part_two(open(f"2023/day{day}.in").readlines()))
+    >>> math.lcm(*part_two(open(f"2023/day{day}.in")))
     13385272668829
     """
     ins, nodes = scan(puzzle)
