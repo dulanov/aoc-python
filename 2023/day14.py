@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Iterable, Iterator
+import bisect
 import collections
 import doctest
 import itertools
@@ -80,10 +81,11 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
 
 def tilt(g: Grid, n: int, /, *, d: Dir = Dir.N) -> None:
     for x in range(1, n - 1):
-        new_cubes = []
+        cubes, new_cubes, lo = g.cube_xs[x], [], 0
         for r1, r2 in itertools.pairwise(g.rock_xs[x]):
-            m = sum(map(lambda c: r1.y < c.y < r2.y, g.cube_xs[x]))
-            new_cubes += [Pos(r1.x, r1.y + i + 1) for i in range(m)]
+            i = bisect.bisect_left(cubes, r1, lo)
+            lo = bisect.bisect_left(cubes, r2, i)
+            new_cubes += [Pos(r1.x, r1.y + i + 1) for i in range(lo - i)]
         g.cube_xs[x] = new_cubes
     g.cube_ys.clear()
     for r in itertools.chain.from_iterable(g.cube_xs.values()):
