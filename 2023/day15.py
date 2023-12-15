@@ -1,5 +1,8 @@
+from itertools import starmap
 from typing import Iterator
+from operator import mul
 import doctest
+import functools
 
 day = "15"
 
@@ -28,15 +31,24 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
-    []
+    [(0, 5), (3, 35)]
 
-    >>> len(part_two(example2.splitlines()))
-    0
+    >>> sum(map(lambda t: (t[0] + 1) * t[1], part_two(example2.splitlines())))
+    145
 
-    >> len(part_two(open(f"2023/day{day}.in")))
-    ???
+    >>> sum(map(lambda t: (t[0] + 1) * t[1], part_two(open(f"2023/day{day}.in"))))
+    230462
     """
-    return []
+    bs = [dict() for _ in range(256)]
+    for op in scan(puzzle):
+        match op.strip("-").split("="):
+            case [lb, n]:
+                bs[calc_hash(lb)][lb] = int(n)
+            case [lb]:
+                bs[calc_hash(lb)].pop(lb, 0)
+    return [
+        (i, sum(starmap(mul, enumerate(b.values(), 1)))) for i, b in enumerate(bs) if b
+    ]
 
 
 def calc_hash(s: str) -> int:
@@ -45,10 +57,7 @@ def calc_hash(s: str) -> int:
     >>> calc_hash("HASH")
     52
     """
-    hash = 0
-    for c in s:
-        hash = ((hash + ord(c)) * 17) % 256
-    return hash
+    return functools.reduce(lambda n, c: (n + ord(c)) * 17 % 256, s, 0)
 
 
 def scan(puzzle: Iterator[str]) -> list[str]:
