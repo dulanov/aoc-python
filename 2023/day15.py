@@ -3,8 +3,7 @@ import doctest
 
 day = "15"
 
-example1 = """\
-"""
+example1 = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7"
 
 
 example2 = example1
@@ -14,15 +13,15 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
-    []
+    [30, 253, 97, 47, 14, 180, 9, 197, 48, 214, 231]
 
-    >>> len(part_one(example1.splitlines()))
-    0
+    >>> sum(part_one(example1.splitlines()))
+    1320
 
-    >> len(part_one(open(f"2023/day{day}.in")))
-    ???
+    >>> sum(part_one(open(f"2023/day{day}.in")))
+    506891
     """
-    return []
+    return [calc_hash(line) for line in scan(puzzle)]
 
 
 def part_two(puzzle: Iterator[str]) -> list[int]:
@@ -52,9 +51,9 @@ def calc_hash(s: str) -> int:
     return hash
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[str]:
+def scan(puzzle: Iterator[str]) -> list[str]:
     for line in puzzle:
-        yield line.strip()
+        return line.strip().split(",")
 
 
 def load_tests(loader, tests, ignore):
