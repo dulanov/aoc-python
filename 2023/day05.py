@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterator
 import bisect
 import collections
 import doctest
@@ -48,7 +48,7 @@ example2 = example1
 Map = collections.namedtuple("Map", ["fr", "to", "dlt"])
 
 
-def part_one(puzzle: Iterable[str]) -> list[tuple[int, ...]]:
+def part_one(puzzle: Iterator[str]) -> list[tuple[int, ...]]:
     """Solve part one of the puzzle.
 
     >>> import pprint
@@ -76,7 +76,7 @@ def part_one(puzzle: Iterable[str]) -> list[tuple[int, ...]]:
     return paths
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example1.splitlines())
@@ -110,7 +110,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     return ranges
 
 
-def scan(puzzle: Iterable[str]) -> tuple[list[int], tuple[list[Map], ...]]:
+def scan(puzzle: Iterator[str]) -> tuple[list[int], tuple[list[Map], ...]]:
     maps = []
     for line in puzzle:
         if line.startswith("seeds:"):

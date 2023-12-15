@@ -1,4 +1,4 @@
-from typing import Iterable, Iterator
+from typing import Iterator
 import doctest
 
 day = "13"
@@ -25,16 +25,16 @@ example1 = """\
 example2 = example1
 
 
-def part_one(puzzle: Iterable[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
     [(5, 0), (0, 4)]
 
-    >>> sum(map(lambda t: t[0] + t[1] * 100, part_one(example1.splitlines())))
+    >>> sum(map(lambda t: t[0] + 100 * t[1], part_one(example1.splitlines())))
     405
 
-    >>> sum(map(lambda t: t[0] + t[1] * 100, part_one(open(f"2023/day{day}.in"))))
+    >>> sum(map(lambda t: t[0] + 100 * t[1], part_one(open(f"2023/day{day}.in"))))
     33356
     """
     result = []
@@ -53,16 +53,16 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     return result
 
 
-def part_two(puzzle: Iterable[str], copies: int = 5) -> list[int]:
+def part_two(puzzle: Iterator[str], copies: int = 5) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
     [(0, 3), (0, 1)]
 
-    >>> sum(map(lambda t: t[0] + t[1] * 100, part_two(example2.splitlines())))
+    >>> sum(map(lambda t: t[0] + 100 * t[1], part_two(example2.splitlines())))
     400
 
-    >>> sum(map(lambda t: t[0] + t[1] * 100, part_two(open(f"2023/day{day}.in"))))
+    >>> sum(map(lambda t: t[0] + 100 * t[1], part_two(open(f"2023/day{day}.in"))))
     28475
     """
     result = []
@@ -97,7 +97,7 @@ def as_num(pattern: list[bool]) -> int:
     return sum(2**i for i, b in enumerate(pattern) if b)
 
 
-def scan(puzzle: Iterable[str]) -> Iterator[list[list[bool]]]:
+def scan(puzzle: Iterator[str]) -> Iterator[list[list[bool]]]:
     pattern = []
     for line in puzzle:
         if line.strip():

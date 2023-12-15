@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterator
 import doctest
 import math
 import re
@@ -13,7 +13,7 @@ Distance:  9  40  200
 example2 = example1
 
 
-def part_one(puzzle: Iterable[str]) -> list[tuple[int, int]]:
+def part_one(puzzle: Iterator[str]) -> list[tuple[int, int]]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -33,7 +33,7 @@ def part_one(puzzle: Iterable[str]) -> list[tuple[int, int]]:
     return wins
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example1.splitlines())
@@ -67,7 +67,7 @@ def solve(t: int, d: int) -> tuple[int, int]:
     return n1, n2
 
 
-def scan(puzzle: Iterable[str], collapsed: bool = False) -> list[tuple[int, int]]:
+def scan(puzzle: Iterator[str], collapsed: bool = False) -> list[tuple[int, int]]:
     for line in puzzle:
         if line.startswith("Time:"):
             if collapsed:

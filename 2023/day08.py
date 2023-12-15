@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterator
 import doctest
 import itertools
 import re
@@ -39,7 +39,7 @@ XXX = (XXX, XXX)
 """
 
 
-def part_one(puzzle: Iterable[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example11.splitlines())
@@ -66,7 +66,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     return path
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -90,7 +90,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     return ns
 
 
-def scan(puzzle: Iterable[str]) -> tuple[list[int], list[tuple[str, str, str]]]:
+def scan(puzzle: Iterator[str]) -> tuple[list[int], list[tuple[str, str, str]]]:
     ins, nodes, r = [], [], re.compile(r"(\w{3}) = \((\w{3}), (\w{3})\)")
     for line in puzzle:
         if not ins:

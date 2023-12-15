@@ -1,4 +1,4 @@
-from typing import Iterable, Iterator
+from typing import Iterator
 import doctest
 
 day = "01"
@@ -33,7 +33,7 @@ replacements = {
 }
 
 
-def part_one(puzzle: Iterable[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -48,7 +48,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     return [t[0] * 10 + t[-1] for t in scan(puzzle)]
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -63,7 +63,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     return [t[0] * 10 + t[-1] for t in scan(puzzle, replacements)]
 
 
-def scan(puzzle: Iterable[str], reps: dict[str, str] = {}) -> Iterator[tuple[int, ...]]:
+def scan(puzzle: Iterator[str], reps: dict[str, str] = {}) -> Iterator[tuple[int, ...]]:
     for line in puzzle:
         for k, v in reps.items():
             line = line.replace(k, v)

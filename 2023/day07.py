@@ -1,6 +1,6 @@
 from __future__ import annotations
 from enum import Enum, auto
-from typing import Iterable, Iterator
+from typing import Iterator
 import collections
 import doctest
 
@@ -72,7 +72,7 @@ class HandType(Enum):
                 return cls.HIGH_CARD
 
 
-def part_one(puzzle: Iterable[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> import pprint
@@ -95,7 +95,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     return sorted(result, key=lambda t: (t[0], *map("23456789TJQKA".index, t[1])))
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> import pprint
@@ -123,7 +123,7 @@ def opt(hand: str) -> str:
     return hand.replace("J", c.most_common()[0][0] if c else "J")
 
 
-def scan(puzzle: Iterable[str]) -> Iterator[tuple[int, str]]:
+def scan(puzzle: Iterator[str]) -> Iterator[tuple[int, str]]:
     for line in puzzle:
         els = line.split()
         yield els[0], int(els[1])

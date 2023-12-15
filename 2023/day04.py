@@ -1,4 +1,4 @@
-from typing import Iterable, Iterator
+from typing import Iterator
 import doctest
 import re
 
@@ -16,7 +16,7 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 example2 = example1
 
 
-def part_one(puzzle: Iterable[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -37,7 +37,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     return result
 
 
-def part_two(puzzle: Iterable[str], n: int) -> list[int]:
+def part_two(puzzle: Iterator[str], n: int) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines(), 6)
@@ -56,7 +56,7 @@ def part_two(puzzle: Iterable[str], n: int) -> list[int]:
     return cards
 
 
-def scan(puzzle: Iterable[str]) -> Iterator[tuple[set[int], set[int]]]:
+def scan(puzzle: Iterator[str]) -> Iterator[tuple[set[int], set[int]]]:
     r = re.compile(r"Card\s+\d+:(.*)\|(.*)")
     for line in puzzle:
         g1, g2 = r.match(line).groups()

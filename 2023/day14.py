@@ -1,9 +1,9 @@
 from enum import Enum
-from typing import Iterable, Iterator
+from itertools import pairwise
+from typing import Iterator
 import bisect
 import collections
 import doctest
-import itertools
 
 day = "14"
 
@@ -30,10 +30,8 @@ class Dir(Enum):
 
 Pos = collections.namedtuple("Pos", "x y")
 
-Grid = collections.namedtuple("Grid", "rock_xs rock_ys cube_xs cube_ys")
 
-
-def part_one(puzzle: Iterable[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -47,61 +45,80 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     >>> sum(starmap(mul, enumerate(reversed(part_one(open(f"2023/day{day}.in"))), start=1)))
     110090
     """
-    g = Grid(
-        collections.defaultdict(list),
-        collections.defaultdict(list),
-        collections.defaultdict(list),
-        collections.defaultdict(list),
-    )
+    rocks, cubes = [], []
     for size, (cube_shaped, rounded) in scan(puzzle):
-        for r in cube_shaped:
-            g.rock_xs[r.x].append(r)
-            g.rock_ys[r.y].append(r)
-        for r in rounded:
-            g.cube_xs[r.x].append(r)
-            g.cube_ys[r.y].append(r)
-    tilt(g, size)
-    return [len(g.cube_ys[y]) for y in range(1, size - 1)]
+        if not rocks:
+            for i in range(size):  # add border of rocks (`#`) around the grid
+                rocks.extend((Pos(i, -1), Pos(-1, i), Pos(i, size), Pos(size, i)))
+        rocks.extend(cube_shaped)
+        cubes.extend(rounded)
+    cubes = tilt(rocks, cubes, size)
+    return list(map(len, iter(cubes, size)))
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterator[str], circles: int = 1_000_000_000) -> list[int]:
     """Solve part two of the puzzle.
 
-    >>> part_two(example2.splitlines())
-    []
+    >>> part_two(example2.splitlines(), circles=1)
+    [0, 1, 2, 2, 3, 2, 1, 4, 1, 2]
 
-    >>> sum(part_two(example2.splitlines()))
-    0
+    >>> part_two(example2.splitlines(), circles=2)
+    [0, 1, 0, 1, 3, 2, 2, 3, 2, 4]
 
-    >> sum(part_two(open(f"2023/day{day}.in")))
-    ???
+    >>> part_two(example2.splitlines(), circles=3)
+    [0, 1, 0, 1, 3, 2, 2, 3, 2, 4]
+
+    >>> from itertools import starmap
+    >>> from operator import mul
+    >>> sum(starmap(mul, enumerate(reversed(part_two(example2.splitlines())), start=1)))
+    64
+
+    >>> sum(starmap(mul, enumerate(reversed(part_two(open(f"2023/day{day}.in"))), start=1)))
+    95254
     """
-    return []
+    rocks, cubes = [], []
+    for size, (cube_shaped, rounded) in scan(puzzle):
+        if not rocks:
+            for i in range(size):  # add border of rocks (`#`) around the grid
+                rocks.extend((Pos(i, -1), Pos(-1, i), Pos(i, size), Pos(size, i)))
+        rocks.extend(cube_shaped)
+        cubes.extend(rounded)
+    loop_detector = {}
+    while circles > 0:
+        for dir in [Dir.N, Dir.W, Dir.S, Dir.E]:
+            cubes = tilt(rocks, cubes, size, dir=dir)
+        circles, hsh = circles - 1, hash(tuple(cubes))
+        if hsh in loop_detector:
+            circles %= loop_detector[hsh] - circles
+        loop_detector[hsh] = circles
+    return list(map(len, iter(cubes, size)))
 
 
-def tilt(g: Grid, n: int, /, *, d: Dir = Dir.N) -> None:
-    for x in range(1, n - 1):
-        cubes, new_cubes, lo = g.cube_xs[x], [], 0
-        for r1, r2 in itertools.pairwise(g.rock_xs[x]):
-            lo = bisect.bisect_left(cubes, r1, lo)
-            lo = bisect.bisect_left(cubes, r2, lo)
-            new_cubes += [Pos(r1.x, r1.y + i + 1) for i in range(lo - i)]
-        g.cube_xs[x] = new_cubes
-    g.cube_ys.clear()
-    for r in itertools.chain.from_iterable(g.cube_xs.values()):
-        g.cube_ys[r.y].append(r)
-    return d
+def tilt(rs: list[Pos], cs: list[Pos], n: int, /, *, dir: Dir = Dir.N) -> list[Pos]:
+    vert, rev = dir in (Dir.N, Dir.S), dir in (Dir.S, Dir.E)
+    new_cubes, delta = [], (0, 1) if vert else (1, 0)
+    for rs, cs in zip(map(pairwise, iter(rs, n, vert=vert)), iter(cs, n, vert=vert)):
+        for r1, r2 in rs:
+            m = bisect.bisect(cs, r2) - bisect.bisect(cs, r1)
+            r, d = (r1, delta) if not rev else (r2, (-delta[0], -delta[1]))
+            new_cubes += [Pos(r.x + i * d[0], r.y + i * d[1]) for i in range(1, m + 1)]
+    return new_cubes
 
 
-def scan(puzzle: Iterable[str]) -> Iterator[tuple[int, tuple[list[Pos], list[Pos]]]]:
-    for y, line in enumerate(puzzle, start=1):
-        line, size = "#" + line.strip() + "#", len(line.strip()) + 2
-        if y == 1:
-            yield size, ([Pos(x, 0) for x in range(size)], [])
-        rounded = [Pos(x, y) for x, c in enumerate(line) if c == "O"]
-        cube_shaped = [Pos(x, y) for x, c in enumerate(line) if c == "#"]
-        yield size, (cube_shaped, rounded)
-    yield size, ([Pos(x, size - 1) for x in range(size)], [])
+def iter(l: list[Pos], n: int, /, *, vert: bool = False) -> Iterator[list[Pos]]:
+    l, lo = sorted(l, key=lambda p: (p.x, p.y) if vert else (p.y, p.x)), 0
+    for i in range(-1, n):
+        hi = bisect.bisect(l, i, lo, key=lambda p: p.x if vert else p.y)
+        if i != -1:  # skip the border of rocks (`#`)
+            yield l[lo:hi]
+        lo = hi
+
+
+def scan(puzzle: Iterator[str]) -> Iterator[tuple[int, tuple[list[Pos], list[Pos]]]]:
+    for y, line in enumerate(puzzle):
+        rounded = [Pos(x, y) for x, c in enumerate(line.strip()) if c == "O"]
+        cube_shaped = [Pos(x, y) for x, c in enumerate(line.strip()) if c == "#"]
+        yield len(line.strip()), (cube_shaped, rounded)
 
 
 def load_tests(loader, tests, ignore):

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Iterable, Iterator
+from typing import Iterator
 from dataclasses import dataclass
 import doctest
 import functools
@@ -31,7 +31,7 @@ class RGB:
         return RGB(max(l.r, r.r), max(l.g, r.g), max(l.b, r.b))
 
 
-def part_one(puzzle: Iterable[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
+def part_one(puzzle: Iterator[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -51,7 +51,7 @@ def part_one(puzzle: Iterable[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
     return result
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -70,7 +70,7 @@ def part_two(puzzle: Iterable[str]) -> list[int]:
     return result
 
 
-def scan(puzzle: Iterable[str]) -> Iterator[list[RGB]]:
+def scan(puzzle: Iterator[str]) -> Iterator[list[RGB]]:
     r1 = re.compile(r"Game (?:\d+): (?P<sets>.*)")
     r2 = re.compile(r"(?P<cubes>\d+) (?P<color>\w+)")
     for line in puzzle:

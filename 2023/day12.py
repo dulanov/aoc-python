@@ -1,4 +1,4 @@
-from typing import Iterable, Iterator
+from typing import Iterator
 import doctest
 import functools
 import itertools
@@ -18,7 +18,7 @@ example1 = """\
 example2 = example1
 
 
-def part_one(puzzle: Iterable[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -33,7 +33,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     return [arrange(pattern, *groups) for pattern, groups in scan(puzzle)]
 
 
-def part_two(puzzle: Iterable[str], copies: int = 5) -> list[int]:
+def part_two(puzzle: Iterator[str], copies: int = 5) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -91,7 +91,7 @@ def is_group(pattern: str) -> bool:
     return "." not in pattern[:-1] and pattern[-1] != "#"
 
 
-def scan(puzzle: Iterable[str]) -> Iterator[tuple[str, list[int]]]:
+def scan(puzzle: Iterator[str]) -> Iterator[tuple[str, list[int]]]:
     for line in puzzle:
         pattern, groups = line.split()
         yield pattern, list(map(int, groups.split(",")))

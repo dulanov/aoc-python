@@ -1,6 +1,6 @@
 from __future__ import annotations
 from enum import Enum
-from typing import Iterable, Iterator
+from typing import Iterator
 import doctest
 
 day = "10"
@@ -96,7 +96,7 @@ class Tile(Enum):
         return next(t for t in cls if s == t.value[0])
 
 
-def part_one(puzzle: Iterable[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> import pprint
@@ -153,7 +153,7 @@ def part_one(puzzle: Iterable[str]) -> list[int]:
     return list(iter(grid, sx, sy, d))
 
 
-def part_two(puzzle: Iterable[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example21.splitlines())
@@ -215,7 +215,7 @@ def iter(
         d = grid[y][x].other(d)
 
 
-def scan(puzzle: Iterable[str]) -> Iterator[list[Tile]]:
+def scan(puzzle: Iterator[str]) -> Iterator[list[Tile]]:
     for line in puzzle:
         yield list(map(Tile.from_str, line))
 
