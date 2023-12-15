@@ -52,8 +52,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
                 rocks.extend((Pos(i, -1), Pos(-1, i), Pos(i, size), Pos(size, i)))
         rocks.extend(cube_shaped)
         cubes.extend(rounded)
-    cubes = tilt(rocks, cubes, size)
-    return list(map(len, iter(cubes, size)))
+    return list(map(len, iter(tilt(rocks, cubes, size), size)))
 
 
 def part_two(puzzle: Iterator[str], circles: int = 1_000_000_000) -> list[int]:
