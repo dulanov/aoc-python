@@ -57,18 +57,13 @@ class Tile:
 
     @classmethod
     def from_str(cls, c: str) -> Tile:
-        match c:
-            case ".":
-                return EmptyTile()
-            case "/":
-                return MirrorTile()
-            case "\\":
-                return MirrorBackslashTile()
-            case "-":
-                return SplitterHorizontalTile()
-            case "|":
-                return SplitterVerticalTile()
-        raise ValueError(f"Invalid tile: {c}")
+        return {
+            ".": EmptyTile,
+            "/": MirrorTile,
+            "\\": MirrorBackslashTile,
+            "-": SplitterHorizontalTile,
+            "|": SplitterVerticalTile,
+        }[c]()
 
 
 class EmptyTile(Tile):
