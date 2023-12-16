@@ -132,7 +132,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     >>> sum(c == "#" for l in part_one(open(f"2023/day{day}.in")) for c in l)
     7860
     """
-    result, grid, stack = [], [], [Beam(-1, 0, Dir.R)]
+    grid, stack = [], [Beam(-1, 0, Dir.R)]
     for tiles in scan(puzzle):
         grid.append(tiles)
     while stack:
@@ -140,13 +140,10 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
         x, y = beam.d.nex_pos(beam.x, beam.y)
         if not (0 <= x < len(grid[0]) and 0 <= y < len(grid)):
             continue
-        tile = grid[y][x]
-        if tile.visited(beam.d):
+        if (tile := grid[y][x]).visited(beam.d):
             continue
         stack += [Beam(x, y, d) for d in tile.process_beam(beam.d)]
-    for tiles in grid:
-        result.append("".join(map(lambda t: "#" if t.energized() else ".", tiles)))
-    return "\n".join(result)
+    return diagram(grid)
 
 
 def part_two(puzzle: Iterator[str]) -> list[int]:
@@ -162,6 +159,13 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     ???
     """
     return []
+
+
+def diagram(grid: list[list[Tile]]) -> str:
+    result = []
+    for tiles in grid:
+        result.append("".join(map(lambda t: "#" if t.energized() else ".", tiles)))
+    return "\n".join(result)
 
 
 def scan(puzzle: Iterator[str]) -> Iterator[list[Tile]]:
