@@ -49,6 +49,7 @@ class Type(Enum):
     def __repr__(self) -> str:
         return self.value
 
+    @functools.cache
     def dir_to_flag(self, d: Dir) -> int:
         match self:
             case Type.EMPTY:
@@ -77,7 +78,6 @@ class Type(Enum):
         if self == Type.SPLITTER_VERTICAL:
             return 3, ([Dir.U], [Dir.D], [Dir.U, Dir.D], [Dir.U, Dir.D])[d.value]
 
-    @functools.cache
     def visited(self, f: int, d: Dir) -> bool:
         return self.dir_to_flag(d) & f
 
