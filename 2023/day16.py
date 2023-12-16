@@ -1,5 +1,6 @@
 from __future__ import annotations
 import collections
+import copy
 from enum import Enum
 from typing import Iterator
 import doctest
@@ -132,9 +133,38 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     >>> sum(c == "#" for l in part_one(open(f"2023/day{day}.in")) for c in l)
     7860
     """
-    grid, stack = [], [Beam(-1, 0, Dir.R)]
-    for tiles in scan(puzzle):
-        grid.append(tiles)
+    grid = [tiles for tiles in scan(puzzle)]
+    return diagram(solve(grid, Beam(-1, 0, Dir.R)))
+
+
+def part_two(puzzle: Iterator[str]) -> list[int]:
+    """Solve part two of the puzzle.
+
+    >>> part_two(example2.splitlines())
+    (51, Beam(x=3, y=-1, d=<Dir.D: 1>))
+
+    >>> part_two(example2.splitlines())[0]
+    51
+
+    >>> part_two(open(f"2023/day{day}.in"))[0]
+    8331
+    """
+    grid, res = [tiles for tiles in scan(puzzle)], (0, None)
+    for (x, y), d, (dx, dy) in [
+        ((0, -1), Dir.D, (1, 0)),
+        ((-1, 0), Dir.R, (0, 1)),
+        ((0, len(grid)), Dir.U, (1, 0)),
+        ((len(grid), 0), Dir.L, (0, 1)),
+    ]:
+        for i in range(len(grid)):
+            beam = Beam(x + i * dx, y + i * dy, d)
+            if (v := energized_tiles(solve(grid, beam))) > res[0]:
+                res = (v, beam)
+    return res
+
+
+def solve(grid: list[list[Tile]], beam: Beam) -> list[list[Tile]]:
+    grid, stack = copy.deepcopy(grid), [beam]
     while stack:
         beam = stack.pop()
         x, y = beam.d.nex_pos(beam.x, beam.y)
@@ -143,22 +173,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
         if (tile := grid[y][x]).visited(beam.d):
             continue
         stack += [Beam(x, y, d) for d in tile.process_beam(beam.d)]
-    return diagram(grid)
-
-
-def part_two(puzzle: Iterator[str]) -> list[int]:
-    """Solve part two of the puzzle.
-
-    >>> part_two(example2.splitlines())
-    []
-
-    >>> sum(part_two(example2.splitlines()))
-    0
-
-    >> sum(part_two(open(f"2023/day{day}.in")))
-    ???
-    """
-    return []
+    return grid
 
 
 def diagram(grid: list[list[Tile]]) -> str:
@@ -166,6 +181,10 @@ def diagram(grid: list[list[Tile]]) -> str:
     for tiles in grid:
         result.append("".join(map(lambda t: "#" if t.energized() else ".", tiles)))
     return "\n".join(result)
+
+
+def energized_tiles(grid: list[list[Tile]]) -> int:
+    return sum(sum(t.energized() for t in tiles) for tiles in grid)
 
 
 def scan(puzzle: Iterator[str]) -> Iterator[list[Tile]]:
