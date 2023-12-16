@@ -36,6 +36,9 @@ class Dir(Enum):
             y + (self == Dir.D) - (self == Dir.U),
         )
 
+    def reverse(self) -> Dir:
+        return (Dir.D, Dir.U, Dir.R, Dir.L)[self.value]
+
 
 class Tile:
     """A tile of the contraption."""
@@ -53,7 +56,7 @@ class Tile:
     def visited(self, d: Dir) -> bool:
         return self.__visited[d.value]
 
-    def visit(self, d: Dir) -> list[Dir]:
+    def visit(self, d: Dir) -> None:
         self.__visited[d.value] = True
 
     @classmethod
@@ -73,6 +76,7 @@ class EmptyTile(Tile):
 
     def process_beam(self, d: Dir) -> list[Dir]:
         self.visit(d)
+        self.visit(d.reverse())
         return [d]
 
 
@@ -80,36 +84,42 @@ class MirrorTile(Tile):
     def __init__(self) -> None:
         super().__init__("/")
 
-    def process_beam(self, d: Dir) -> list[Dir]:
-        self.visit(d)
-        return ([Dir.R], [Dir.L], [Dir.D], [Dir.U])[d.value]
+    def process_beam(self, dir: Dir) -> list[Dir]:
+        self.visit(dir)
+        new_d = (Dir.R, Dir.L, Dir.D, Dir.U)[dir.value]
+        self.visit(new_d.reverse())
+        return [new_d]
 
 
 class MirrorBackslashTile(Tile):
     def __init__(self) -> None:
         super().__init__("\\")
 
-    def process_beam(self, d: Dir) -> list[Dir]:
-        self.visit(d)
-        return ([Dir.L], [Dir.R], [Dir.U], [Dir.D])[d.value]
+    def process_beam(self, dir: Dir) -> list[Dir]:
+        self.visit(dir)
+        new_d = (Dir.L, Dir.R, Dir.U, Dir.D)[dir.value]
+        self.visit(new_d.reverse())
+        return [new_d]
 
 
 class SplitterHorizontalTile(Tile):
     def __init__(self) -> None:
         super().__init__("-")
 
-    def process_beam(self, d: Dir) -> list[Dir]:
-        self.visit(d)
-        return ([Dir.L, Dir.R], [Dir.L, Dir.R], [Dir.L], [Dir.R])[d.value]
+    def process_beam(self, dir: Dir) -> list[Dir]:
+        for d in Dir.__members__.values():
+            self.visit(d)
+        return ([Dir.L, Dir.R], [Dir.L, Dir.R], [Dir.L], [Dir.R])[dir.value]
 
 
 class SplitterVerticalTile(Tile):
     def __init__(self) -> None:
         super().__init__("|")
 
-    def process_beam(self, d: Dir) -> list[Dir]:
-        self.visit(d)
-        return ([Dir.U], [Dir.D], [Dir.U, Dir.D], [Dir.U, Dir.D])[d.value]
+    def process_beam(self, dir: Dir) -> list[Dir]:
+        for d in Dir.__members__.values():
+            self.visit(d)
+        return ([Dir.U], [Dir.D], [Dir.U, Dir.D], [Dir.U, Dir.D])[dir.value]
 
 
 def part_one(puzzle: Iterator[str]) -> list[int]:
@@ -164,15 +174,15 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
 
 
 def solve(grid: list[list[Tile]], beam: Beam) -> list[list[Tile]]:
-    grid, stack = copy.deepcopy(grid), [beam]
+    grid, size, stack = copy.deepcopy(grid), len(grid), collections.deque([beam])
     while stack:
         beam = stack.pop()
         x, y = beam.d.nex_pos(beam.x, beam.y)
-        if not (0 <= x < len(grid[0]) and 0 <= y < len(grid)):
+        if not (0 <= x < size and 0 <= y < size):
             continue
         if (tile := grid[y][x]).visited(beam.d):
             continue
-        stack += [Beam(x, y, d) for d in tile.process_beam(beam.d)]
+        stack.extend(Beam(x, y, d) for d in tile.process_beam(beam.d))
     return grid
 
 
