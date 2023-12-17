@@ -1,6 +1,7 @@
 from __future__ import annotations
 from collections import deque, namedtuple
 from enum import Enum
+import functools
 from typing import Iterator
 import doctest
 import operator
@@ -27,13 +28,39 @@ example2 = example1
 Beam = namedtuple("Beam", "x y d")
 
 
+class Grid:
+    def __init__(self, iter: Iterator[list[Type]]) -> None:
+        self.grid = [tiles for tiles in iter]
+
+    def __contains__(self, pos: tuple[int, int]) -> bool:
+        return 0 <= pos[0] < len(self) and 0 <= pos[1] < len(self)
+
+    def __getitem__(self, pos: tuple[int, int]) -> Type:
+        return self.grid[pos[1]][pos[0]]
+
+    def __iter__(self) -> Iterator[list[Type]]:
+        return iter(self.grid)
+
+    def __len__(self) -> int:
+        return len(self.grid)
+
+    @functools.cache
+    def slide(self, x: int, y: int, d: Dir) -> int:
+        if not (x, y) in self:
+            return 0
+        x2, y2 = x, y
+        while (x2, y2) in self and self.grid[y2][x2].slide(d):
+            x2, y2 = d.nex_pos(x2, y2)
+        return abs(x2 - x) + abs(y2 - y)
+
+
 class Dir(Enum):
     U, D, L, R = range(4)
 
-    def nex_pos(self, x: int, y: int) -> tuple[int, int]:
+    def nex_pos(self, x: int, y: int, n: int = 1) -> tuple[int, int]:
         return (
-            x + (self == Dir.R) - (self == Dir.L),
-            y + (self == Dir.D) - (self == Dir.U),
+            x + n * ((self == Dir.R) - (self == Dir.L)),
+            y + n * ((self == Dir.D) - (self == Dir.U)),
         )
 
 
@@ -63,7 +90,7 @@ class Type(Enum):
         if self == Type.SPLITTER_VERTICAL:
             return ([Dir.U], [Dir.D], [Dir.U, Dir.D], [Dir.U, Dir.D])[d.value]
 
-    def projection(self, d: Dir) -> tuple[bool, bool]:
+    def proj(self, d: Dir) -> tuple[bool, bool]:
         if self == Type.EMPTY:
             return (True, False) if d in (Dir.U, Dir.D) else (False, True)
 
@@ -78,6 +105,19 @@ class Type(Enum):
 
         if self == self == Type.SPLITTER_VERTICAL:
             return (False, True) if d in (Dir.U, Dir.D) else (True, True)
+
+    def slide(self, d: Dir) -> bool:
+        if self == Type.EMPTY:
+            return True
+
+        if self == Type.MIRROR or self == Type.MIRROR_BACKSLASH:
+            return False
+
+        if self == Type.SPLITTER_HORIZONTAL:
+            return d in (Dir.L, Dir.R)
+
+        if self == self == Type.SPLITTER_VERTICAL:
+            return d in (Dir.U, Dir.D)
 
     @classmethod
     def from_str(cls, s: str) -> Type:
@@ -105,8 +145,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     >>> sum(c == "#" for l in part_one(open(f"2023/day{day}.in")) for c in l)
     7860
     """
-    grid = [tiles for tiles in scan(puzzle)]
-    return diagram(solve(grid, Beam(-1, 0, Dir.R)))
+    return diagram(solve(Grid(scan(puzzle)), Beam(-1, 0, Dir.R)))
 
 
 def part_two(puzzle: Iterator[str]) -> list[int]:
@@ -121,7 +160,7 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     >>> part_two(open(f"2023/day{day}.in"))[0]
     8331
     """
-    grid, rs = [tiles for tiles in scan(puzzle)], (0, None)
+    grid, rs = Grid(scan(puzzle)), (0, None)
     for (x, y), (dx, dy), d in [
         ((0, -1), (1, 0), Dir.D),
         ((-1, 0), (0, 1), Dir.R),
@@ -135,24 +174,39 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     return rs
 
 
-def solve(grid: list[list[tuple[Type, int]]], beam: Beam) -> list[list[bool]]:
+def solve(grid: Grid, beam: Beam) -> list[list[bool]]:
     stack, visited = deque([beam]), (
-        [[False] * len(grid[0]) for _ in range(len(grid))],
-        [[False] * len(grid[0]) for _ in range(len(grid))],
+        [[False] * len(grid) for _ in range(len(grid))],
+        [[False] * len(grid) for _ in range(len(grid))],
     )
     while stack:
         beam = stack.pop()
         x, y = beam.d.nex_pos(beam.x, beam.y)
-        if not (0 <= x < len(grid[0]) and 0 <= y < len(grid)):
+        if n := grid.slide(x, y, beam.d):  # sliding until hit
+            new_x, new_y = beam.d.nex_pos(x, y, n)
+            if new_y == y:
+                step = 1 if new_x > x else -1
+                if new_x == -1:
+                    visited[0][y][x::step] = [True] * n
+                else:
+                    visited[0][y][x:new_x:step] = [True] * n
+            else:
+                step = 1 if new_y > y else -1
+                if new_y == -1:
+                    visited[1][x][y::step] = [True] * n
+                else:
+                    visited[1][x][y:new_y:step] = [True] * n
+            x, y = new_x, new_y
+        if (x, y) not in grid:
             continue
-        tile, (b1, b2) = grid[y][x], grid[y][x].projection(beam.d)
-        if visited[0][y][x] and b1 or visited[1][y][x] and b2:
+        tile, (b1, b2) = grid[x, y], grid[x, y].proj(beam.d)
+        if visited[0][y][x] and b1 or visited[1][x][y] and b2:
             continue
-        visited[0][y][x], visited[1][y][x] = b1, b2
+        visited[0][y][x], visited[1][x][y] = b1, b2
         stack.extend(Beam(x, y, d) for d in tile.beam(beam.d))
     return [
         list(map(operator.or_, tiles1, tiles2))
-        for tiles1, tiles2 in zip(visited[0], visited[1])
+        for tiles1, tiles2 in zip(visited[0], transpose(visited[1]))
     ]
 
 
@@ -165,6 +219,10 @@ def diagram(visited: list[list[bool]]) -> str:
 
 def energized_tiles(visited: list[list[bool]]) -> int:
     return sum(sum(t for t in tiles) for tiles in visited)
+
+
+def transpose(visited: list[list[bool]]) -> list[list[bool]]:
+    return list(map(list, zip(*visited)))
 
 
 def scan(puzzle: Iterator[str]) -> Iterator[list[Type]]:
