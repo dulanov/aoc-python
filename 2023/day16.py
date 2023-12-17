@@ -1,10 +1,9 @@
 from __future__ import annotations
-import collections
+from collections import deque, namedtuple
 from enum import Enum
-import functools
-import itertools
 from typing import Iterator
 import doctest
+import operator
 
 day = "16"
 
@@ -25,13 +24,12 @@ example1 = r"""
 example2 = example1
 
 
-Beam = collections.namedtuple("Beam", "x y d")
+Beam = namedtuple("Beam", "x y d")
 
 
 class Dir(Enum):
     U, D, L, R = range(4)
 
-    @functools.cache
     def nex_pos(self, x: int, y: int) -> tuple[int, int]:
         return (
             x + (self == Dir.R) - (self == Dir.L),
@@ -49,37 +47,37 @@ class Type(Enum):
     def __repr__(self) -> str:
         return self.value
 
-    @functools.cache
-    def dir_to_flag(self, d: Dir) -> int:
-        match self:
-            case Type.EMPTY:
-                return 1 if d in (Dir.U, Dir.D) else 2
-            case Type.MIRROR:
-                return 1 if d in (Dir.U, Dir.L) else 2
-            case Type.MIRROR_BACKSLASH:
-                return 1 if d in (Dir.U, Dir.R) else 2
-            case Type.SPLITTER_HORIZONTAL | Type.SPLITTER_VERTICAL:
-                return 3
-
-    @functools.cache
-    def process_beam(self, d: Dir) -> tuple[int, list[Dir]]:
+    def beam(self, d: Dir) -> list[Dir]:
         if self == Type.EMPTY:
-            return self.dir_to_flag(d), [d]
+            return [d]
 
         if self == Type.MIRROR:
-            return self.dir_to_flag(d), [(Dir.R, Dir.L, Dir.D, Dir.U)[d.value]]
+            return [(Dir.R, Dir.L, Dir.D, Dir.U)[d.value]]
 
         if self == Type.MIRROR_BACKSLASH:
-            return self.dir_to_flag(d), [(Dir.L, Dir.R, Dir.U, Dir.D)[d.value]]
+            return [(Dir.L, Dir.R, Dir.U, Dir.D)[d.value]]
 
         if self == Type.SPLITTER_HORIZONTAL:
-            return 3, ([Dir.L, Dir.R], [Dir.L, Dir.R], [Dir.L], [Dir.R])[d.value]
+            return ([Dir.L, Dir.R], [Dir.L, Dir.R], [Dir.L], [Dir.R])[d.value]
 
         if self == Type.SPLITTER_VERTICAL:
-            return 3, ([Dir.U], [Dir.D], [Dir.U, Dir.D], [Dir.U, Dir.D])[d.value]
+            return ([Dir.U], [Dir.D], [Dir.U, Dir.D], [Dir.U, Dir.D])[d.value]
 
-    def visited(self, f: int, d: Dir) -> bool:
-        return self.dir_to_flag(d) & f
+    def projection(self, d: Dir) -> tuple[bool, bool]:
+        if self == Type.EMPTY:
+            return (True, False) if d in (Dir.U, Dir.D) else (False, True)
+
+        if self == Type.MIRROR:
+            return (True, False) if d in (Dir.U, Dir.L) else (False, True)
+
+        if self == Type.MIRROR_BACKSLASH:
+            return (True, False) if d in (Dir.U, Dir.R) else (False, True)
+
+        if self == Type.SPLITTER_HORIZONTAL:
+            return (True, False) if d in (Dir.L, Dir.R) else (True, True)
+
+        if self == self == Type.SPLITTER_VERTICAL:
+            return (False, True) if d in (Dir.U, Dir.D) else (True, True)
 
     @classmethod
     def from_str(cls, s: str) -> Type:
@@ -108,8 +106,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     7860
     """
     grid = [tiles for tiles in scan(puzzle)]
-    solve(grid, Beam(-1, 0, Dir.R))
-    return diagram(grid)
+    return diagram(solve(grid, Beam(-1, 0, Dir.R)))
 
 
 def part_two(puzzle: Iterator[str]) -> list[int]:
@@ -124,55 +121,57 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     >>> part_two(open(f"2023/day{day}.in"))[0]
     8331
     """
-    grid, res = [tiles for tiles in scan(puzzle)], (0, None)
-    for (x, y), d, (dx, dy) in [
-        ((0, -1), Dir.D, (1, 0)),
-        ((-1, 0), Dir.R, (0, 1)),
-        ((0, len(grid)), Dir.U, (1, 0)),
-        ((len(grid), 0), Dir.L, (0, 1)),
+    grid, rs = [tiles for tiles in scan(puzzle)], (0, None)
+    for (x, y), (dx, dy), d in [
+        ((0, -1), (1, 0), Dir.D),
+        ((-1, 0), (0, 1), Dir.R),
+        ((0, len(grid)), (1, 0), Dir.U),
+        ((len(grid), 0), (0, 1), Dir.L),
     ]:
         for i in range(len(grid)):
-            for j, k in itertools.product(range(len(grid[0])), range(len(grid))):
-                grid[k][j] = grid[k][j][0], 0
             beam = Beam(x + i * dx, y + i * dy, d)
-            solve(grid, beam)
-            if (v := energized_tiles(grid)) > res[0]:
-                res = (v, beam)
-    return res
+            if (v := energized_tiles(solve(grid, beam))) > rs[0]:
+                rs = (v, beam)
+    return rs
 
 
-def solve(grid: list[list[tuple[Type, int]]], beam: Beam) -> None:
-    stack = collections.deque([beam])
+def solve(grid: list[list[tuple[Type, int]]], beam: Beam) -> list[list[bool]]:
+    stack, visited = deque([beam]), (
+        [[False] * len(grid[0]) for _ in range(len(grid))],
+        [[False] * len(grid[0]) for _ in range(len(grid))],
+    )
     while stack:
         beam = stack.pop()
         x, y = beam.d.nex_pos(beam.x, beam.y)
         if not (0 <= x < len(grid[0]) and 0 <= y < len(grid)):
             continue
-        tile = grid[y][x]
-        if tile[0].visited(tile[1], beam.d):
+        tile, (b1, b2) = grid[y][x], grid[y][x].projection(beam.d)
+        if visited[0][y][x] and b1 or visited[1][y][x] and b2:
             continue
-        f, dirs = tile[0].process_beam(beam.d)
-        grid[y][x] = tile[0], tile[1] | f
-        stack.extend(Beam(x, y, d) for d in dirs)
-    return grid
+        visited[0][y][x], visited[1][y][x] = b1, b2
+        stack.extend(Beam(x, y, d) for d in tile.beam(beam.d))
+    return [
+        list(map(operator.or_, tiles1, tiles2))
+        for tiles1, tiles2 in zip(visited[0], visited[1])
+    ]
 
 
-def diagram(grid: list[list[tuple[Type, int]]]) -> str:
+def diagram(visited: list[list[bool]]) -> str:
     result = []
-    for tiles in grid:
-        result.append("".join(map(lambda t: "#" if t[1] != 0 else ".", tiles)))
+    for tiles in visited:
+        result.append("".join(map(lambda t: "#" if t else ".", tiles)))
     return "\n".join(result)
 
 
-def energized_tiles(grid: list[list[tuple[Type, int]]]) -> int:
-    return sum(sum(t[1] != 0 for t in tiles) for tiles in grid)
+def energized_tiles(visited: list[list[bool]]) -> int:
+    return sum(sum(t for t in tiles) for tiles in visited)
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[list[tuple[Type, int]]]:
+def scan(puzzle: Iterator[str]) -> Iterator[list[Type]]:
     for line in puzzle:
         if not (line := line.strip("\n")):
             continue
-        yield [(Type.from_str(c), 0) for c in line]
+        yield [Type.from_str(c) for c in line]
 
 
 def load_tests(loader, tests, ignore):
