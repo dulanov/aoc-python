@@ -4,6 +4,7 @@ from typing import Iterator
 import bisect
 import collections
 import doctest
+import functools
 
 day = "14"
 
@@ -52,6 +53,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
                 rocks.extend((Pos(i, -1), Pos(-1, i), Pos(i, size), Pos(size, i)))
         rocks.extend(cube_shaped)
         cubes.extend(rounded)
+    rocks = iter(rocks, size, vert=True)
     return list(map(len, iter(tilt(rocks, cubes, size), size)))
 
 
@@ -82,35 +84,51 @@ def part_two(puzzle: Iterator[str], circles: int = 1_000_000_000) -> list[int]:
                 rocks.extend((Pos(i, -1), Pos(-1, i), Pos(i, size), Pos(size, i)))
         rocks.extend(cube_shaped)
         cubes.extend(rounded)
-    loop_detector = {}
+    loop_hash, vrocks, hrocks = {}, iter(rocks, size, vert=True), iter(rocks, size)
     while circles > 0:
-        for dir in [Dir.N, Dir.W, Dir.S, Dir.E]:
-            cubes = tilt(rocks, cubes, size, dir=dir)
+        for dir, rocks in [
+            (Dir.N, vrocks),
+            (Dir.W, hrocks),
+            (Dir.S, vrocks),
+            (Dir.E, hrocks),
+        ]:
+            cubes = tilt(rocks, cubes, size, dir)
         circles, hsh = circles - 1, hash(tuple(cubes))
-        if hsh in loop_detector:
-            circles %= loop_detector[hsh] - circles
-        loop_detector[hsh] = circles
+        if hsh in loop_hash:
+            circles %= loop_hash[hsh] - circles
+        loop_hash[hsh] = circles
     return list(map(len, iter(cubes, size)))
 
 
-def tilt(rs: list[Pos], cs: list[Pos], n: int, /, *, dir: Dir = Dir.N) -> list[Pos]:
-    vert, rev = dir in (Dir.N, Dir.S), dir in (Dir.S, Dir.E)
-    new_cubes, delta = [], (0, 1) if vert else (1, 0)
-    for rs, cs in zip(map(pairwise, iter(rs, n, vert=vert)), iter(cs, n, vert=vert)):
+def tilt(rs: list[list[Pos]], cs: list[Pos], n: int, d: Dir = Dir.N) -> list[Pos]:
+    new_cubes, vert, rev = [], d in (Dir.N, Dir.S), d in (Dir.S, Dir.E)
+    for rs, cs in zip(map(pairwise, rs), iter(cs, n, vert=vert)):
+        lo = None
         for r1, r2 in rs:
-            m = bisect.bisect(cs, r2) - bisect.bisect(cs, r1)
-            r, d = (r1, delta) if not rev else (r2, (-delta[0], -delta[1]))
-            new_cubes += [Pos(r.x + i * d[0], r.y + i * d[1]) for i in range(1, m + 1)]
+            if lo is None:
+                lo = bisect.bisect(cs, r1)
+            lo, prev = bisect.bisect(cs, r2, lo), lo
+            new_cubes.extend(cubes(r1, r2, lo - prev, vert=vert, rev=rev))
     return new_cubes
 
 
-def iter(l: list[Pos], n: int, /, *, vert: bool = False) -> Iterator[list[Pos]]:
-    l, lo = sorted(l, key=lambda p: (p.x, p.y) if vert else (p.y, p.x)), 0
+def iter(l: list[Pos], n: int, /, *, vert: bool = False) -> list[list[Pos]]:
+    l, ls, lo = sorted(l, key=lambda p: (p.x, p.y) if vert else (p.y, p.x)), [], 0
     for i in range(-1, n):
         hi = bisect.bisect(l, i, lo, key=lambda p: p.x if vert else p.y)
         if i != -1:  # skip the border of rocks (`#`)
-            yield l[lo:hi]
+            ls.append(l[lo:hi])
         lo = hi
+    return ls
+
+
+@functools.cache
+def cubes(
+    p1: Pos, p2: Pos, n: int, /, *, vert: bool = False, rev: bool = False
+) -> list[Pos]:
+    delta = (0, 1) if vert else (1, 0)
+    p, delta = (p1, delta) if not rev else (p2, (-delta[0], -delta[1]))
+    return [Pos(p.x + i * delta[0], p.y + i * delta[1]) for i in range(1, n + 1)]
 
 
 def scan(puzzle: Iterator[str]) -> Iterator[tuple[int, tuple[list[Pos], list[Pos]]]]:
