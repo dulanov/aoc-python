@@ -4,7 +4,6 @@ from enum import Enum
 import functools
 from typing import Iterator
 import doctest
-import operator
 
 day = "16"
 
@@ -124,7 +123,7 @@ class Type(Enum):
         return next(t for t in cls if s == t.value)
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: Iterator[str]) -> str:
     """Solve part one of the puzzle.
 
     >>> print(part_one(example1.splitlines()))
@@ -145,10 +144,14 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     >>> sum(c == "#" for l in part_one(open(f"2023/day{day}.in")) for c in l)
     7860
     """
-    return diagram(solve(Grid(scan(puzzle)), Beam(-1, 0, Dir.R)))
+    result, grid = [], Grid(scan(puzzle))
+    seen = solve(grid, Beam(-1, 0, Dir.R))
+    for y in range(len(grid)):
+        result.append("".join("#" if (x, y) in seen else "." for x in range(len(grid))))
+    return "\n".join(result)
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> tuple(int, Beam):
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -169,60 +172,36 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     ]:
         for i in range(len(grid)):
             beam = Beam(x + i * dx, y + i * dy, d)
-            if (v := energized_tiles(solve(grid, beam))) > rs[0]:
+            if (v := len(solve(grid, beam))) > rs[0]:
                 rs = (v, beam)
     return rs
 
 
-def solve(grid: Grid, beam: Beam) -> list[list[bool]]:
-    stack, visited = deque([beam]), (
-        [[False] * len(grid) for _ in range(len(grid))],
-        [[False] * len(grid) for _ in range(len(grid))],
-    )
+def solve(grid: Grid, beam: Beam) -> set[complex]:
+    seen, stack = (set(), set()), deque([beam])
     while stack:
         beam = stack.pop()
         x, y = beam.d.nex_pos(beam.x, beam.y)
         if n := grid.slide(x, y, beam.d):  # sliding until hit
-            new_x, new_y = beam.d.nex_pos(x, y, n)
-            if new_y == y:
-                step = 1 if new_x > x else -1
-                if new_x == -1:
-                    visited[0][y][x::step] = [True] * n
-                else:
-                    visited[0][y][x:new_x:step] = [True] * n
+            nx, ny = beam.d.nex_pos(x, y, n)
+            if ny == y:
+                seen[0].update((i, y) for i in range(x, nx, 1 if nx > x else -1))
             else:
-                step = 1 if new_y > y else -1
-                if new_y == -1:
-                    visited[1][x][y::step] = [True] * n
-                else:
-                    visited[1][x][y:new_y:step] = [True] * n
-            x, y = new_x, new_y
+                seen[1].update((x, i) for i in range(y, ny, 1 if ny > y else -1))
+            x, y = nx, ny
         if (x, y) not in grid:
             continue
-        tile, (b1, b2) = grid[x, y], grid[x, y].proj(beam.d)
-        if visited[0][y][x] and b1 or visited[1][x][y] and b2:
-            continue
-        visited[0][y][x], visited[1][x][y] = b1, b2
-        stack.extend(Beam(x, y, d) for d in tile.beam(beam.d))
-    return [
-        list(map(operator.or_, tiles1, tiles2))
-        for tiles1, tiles2 in zip(visited[0], transpose(visited[1]))
-    ]
-
-
-def diagram(visited: list[list[bool]]) -> str:
-    result = []
-    for tiles in visited:
-        result.append("".join(map(lambda t: "#" if t else ".", tiles)))
-    return "\n".join(result)
-
-
-def energized_tiles(visited: list[list[bool]]) -> int:
-    return sum(sum(t for t in tiles) for tiles in visited)
-
-
-def transpose(visited: list[list[bool]]) -> list[list[bool]]:
-    return list(map(list, zip(*visited)))
+        (b1, b2) = grid[x, y].proj(beam.d)
+        if b1:
+            if (x, y) in seen[0]:
+                continue
+            seen[0].add((x, y))
+        if b2:
+            if (x, y) in seen[1]:
+                continue
+            seen[1].add((x, y))
+        stack.extend(Beam(x, y, d) for d in grid[x, y].beam(beam.d))
+    return seen[0].union(seen[1])
 
 
 def scan(puzzle: Iterator[str]) -> Iterator[list[Type]]:

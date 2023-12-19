@@ -27,7 +27,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return [calc_hash(line) for line in scan(puzzle)]
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> list[tuple[int, int]]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
