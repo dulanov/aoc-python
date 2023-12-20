@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-import re
 from typing import Iterator
 import collections
 import doctest
+import itertools
+import math
+import re
 
 day = "19"
 
@@ -35,16 +37,33 @@ Part = collections.namedtuple("Part", "x m a s")
 @dataclass
 class Rule:
     next: str
-    category: int = 0
+    what: int = 0
     left: int = 0
     right: int = 0
 
     def __call__(self, part: Part) -> tuple[bool, str]:
-        if self.left and part[self.category] <= self.left:
+        if self.left and part[self.what] <= self.left:
             return False, ""
-        if self.right and part[self.category] >= self.right:
+        if self.right and part[self.what] >= self.right:
             return False, ""
         return True, self.next
+
+    def split(self, part: Part) -> tuple[str, Part, Part]:
+        if self.left:
+            if part[self.what][0] >= self.left:
+                return None, Part((0, 0), (0, 0), (0, 0), (0, 0)), part
+            d1, d2 = part._asdict(), part._asdict()
+            d1["xmas"[self.what]] = self.left + 1, part[self.what][1]
+            d2["xmas"[self.what]] = part[self.what][0], self.left + 1
+            return self.next, Part(**d1), Part(**d2)
+        if self.right:
+            if part[self.what][1] <= self.right:
+                return None, Part((0, 0), (0, 0), (0, 0), (0, 0)), part
+            d1, d2 = part._asdict(), part._asdict()
+            d1["xmas"[self.what]] = part[self.what][0], self.right
+            d2["xmas"[self.what]] = self.right, part[self.what][1]
+            return self.next, Part(**d1), Part(**d2)
+        return self.next, part, Part((0, 0), (0, 0), (0, 0), (0, 0))
 
 
 def part_one(puzzle: Iterator[str]) -> list[tuple[bool, list[int]]]:
@@ -68,47 +87,40 @@ def part_one(puzzle: Iterator[str]) -> list[tuple[bool, list[int]]]:
     for part in parts:
         name = "in"
         while name not in ("A", "R"):
-            name = process(workflows[name], part)
+            for rule in workflows[name]:
+                done, name = rule(part)
+                if done:
+                    break
         res.append((name == "A", part))
     return res
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> tuple[int, int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
-    []
+    (167409079868000, 88590920132000)
 
-    >>> sum(part_two(example2.splitlines()))
-    0
+    >>> part_two(example2.splitlines())[0]
+    167409079868000
 
-    >> sum(part_two(open(f"2023/day{day}.in")))
-    ???
+    >>> part_two(open(f"2023/day{day}.in"))[0]
+    134370637448305
     """
-    return []
-
-
-def process(rules: list[Rule], part: Part) -> str:
-    """Process a part through workflow and return the next.
-
-    >>> p = Part(787, 2655, 1222, 2876)
-    >>> process([Rule("px", 3, 0, 1351), Rule("qqz")], p)
-    'qqz'
-
-    >>> process([Rule("qs", 3, 2770, 0), Rule("hdj", 1, 0, 1801), Rule("R")], p)
-    'qs'
-
-    >>> process([Rule("A", 3, 3448, 0), Rule("lnx")], p)
-    'lnx'
-
-    >>> process([Rule("A", 1, 1548, 0), Rule("A")], p)
-    'A'
-    """
-    for rule in rules:
-        done, next = rule(part)
-        if done:
-            return next
-    raise ValueError(f"Could not process {part}")
+    (workflows, _), res = scan(puzzle), {"A": 0, "R": 0}
+    jobs = [("in", Part((1, 4001), (1, 4001), (1, 4001), (1, 4001)))]
+    while jobs:
+        name, part = jobs.pop()
+        for rule in workflows[name]:
+            name1, part1, part = rule.split(part)
+            num1 = math.prod(itertools.starmap(lambda a, b: b - a, part1))
+            if not num1:
+                continue
+            if name1 in ("A", "R"):
+                res[name1] += num1
+                continue
+            jobs.append((name1, part1))
+    return res["A"], res["R"]
 
 
 def scan(puzzle: Iterator[str]) -> tuple[dict[str, list[Rule]], list[Part]]:
