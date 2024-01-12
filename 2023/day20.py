@@ -70,7 +70,7 @@ class Inverter(Module):
         return ((rx, v) for rx in self._dest)
 
 
-def part_one(puzzle: Iterator[str], n: int = 1_000) -> list[int]:
+def part_one(puzzle: Iterator[str], n: int = 1_000) -> tuple[int, int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example11.splitlines())
@@ -98,7 +98,7 @@ def part_one(puzzle: Iterator[str], n: int = 1_000) -> list[int]:
     return tuple(rs)
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: Iterator[str]) -> tuple[int, int, int, int]:
     """Solve part two of the puzzle.
 
     >>> import math
@@ -114,7 +114,7 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
             break
         # 'vf' is just invertor before `rx`
         cycle(modules, lambda rx, hp: rs.append(i) if rx == "vf" and hp else None)
-    return rs
+    return tuple(rs)
 
 
 def cycle(modules: dict[str, Module], fn: Callable[[str, bool], None]) -> None:
