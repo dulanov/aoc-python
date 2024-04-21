@@ -2,6 +2,12 @@
 
 [Advent of Code](https://adventofcode.com) solutions in vanilla [Python](https://www.python.org/) without using any external dependencies.
 
+## TODO
+
+* [ ] Complete the puzzles for 2023
+* [ ] Start to use Pyright by CI/CD
+* [ ] Since 2024 start using numpy 2
+
 ## Usage
 
 All solutions can be checked with [doctest module](https://docs.python.org/3/library/doctest.html) by running the following command:
