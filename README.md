@@ -6,8 +6,6 @@
 
 * [ ] Complete the puzzles for 2023
 * [ ] Start to use Pyright by CI/CD
-* [ ] Since 2024 start using numpy 2
-* [ ] Since 2025 start using Z3 solver
 
 ## Usage
 
