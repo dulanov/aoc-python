@@ -12,7 +12,7 @@
 All solutions can be checked with [doctest module](https://docs.python.org/3/library/doctest.html) by running the following command:
 
 ```shell
-python -m doctest ./2023/dayXY.py
+python -m doctest ./202x/dayXY.py
 ```
 
 ## Unlicense
