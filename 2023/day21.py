@@ -1,5 +1,5 @@
-from typing import Iterator
 import doctest
+from typing import Iterator
 
 day = "21"
 
@@ -24,8 +24,8 @@ example2 = example1
 def part_one(puzzle: Iterator[str], n: int = 64) -> list[int]:
     """Solve part one of the puzzle.
 
-    >>> import pprint
-    >>> pprint.pprint(part_one(example1.splitlines(), n=6))
+    >> import pprint
+    >> pprint.pprint(part_one(example1.splitlines(), n=6))
     [(2, 8),
      (3, 1),
      (3, 3),
@@ -43,7 +43,7 @@ def part_one(puzzle: Iterator[str], n: int = 64) -> list[int]:
      (7, 5),
      (9, 3)]
 
-    >>> sum(part_one(example1.splitlines()))
+    >> sum(part_one(example1.splitlines()))
     16
 
     >> sum(part_one(open(f"2023/day{day}.in")))
