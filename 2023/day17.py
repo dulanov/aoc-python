@@ -1,10 +1,11 @@
 from __future__ import annotations
-from enum import Enum
-from typing import Iterator
+
 import doctest
 import heapq
+from enum import Enum
+from typing import Iterator
 
-day = "17"
+day = "17"  # https://adventofcode.com/2023/day/17
 
 example1 = """\
 2413432311323
@@ -53,7 +54,7 @@ class Dir(Enum):
         )
 
 
-def part_one(puzzle: Iterator[str]) -> int:
+def part_one(puzzle: list[str]) -> int:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -65,7 +66,7 @@ def part_one(puzzle: Iterator[str]) -> int:
     return solve(list(scan(puzzle)))
 
 
-def part_two(puzzle: Iterator[str]) -> int:
+def part_two(puzzle: list[str]) -> int:
     """Solve part two of the puzzle.
 
     >>> part_two(example21.splitlines())
@@ -80,7 +81,7 @@ def part_two(puzzle: Iterator[str]) -> int:
     return solve(list(scan(puzzle)), min=4, max=10)
 
 
-def solve(grid: list[list[int]], /, *, min: int = 1, max: int = 3) -> int:
+def solve(grid: list[list[int]], /, *, min: int = 1, max: int = 3) -> int:  # type: ignore
     pq, seen = [(0, 0, 0, Dir.R), (0, 0, 0, Dir.D)], set()
     while pq:
         n, x, y, d = heapq.heappop(pq)
@@ -100,7 +101,7 @@ def solve(grid: list[list[int]], /, *, min: int = 1, max: int = 3) -> int:
                     heapq.heappush(pq, (n + sum(costs), nx, ny, d))
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[list[int]]:
+def scan(puzzle: list[str]) -> Iterator[list[int]]:
     for line in puzzle:
         yield [int(c) for c in line.strip("\n")]
 

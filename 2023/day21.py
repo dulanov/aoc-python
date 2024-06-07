@@ -1,7 +1,7 @@
 import doctest
 from typing import Iterator
 
-day = "21"
+day = "21"  # https://adventofcode.com/2023/day/21
 
 example1 = """\
 ...........
@@ -21,7 +21,7 @@ example1 = """\
 example2 = example1
 
 
-def part_one(puzzle: Iterator[str], n: int = 64) -> list[int]:
+def part_one(puzzle: list[str], n: int = 64) -> list[int]:
     """Solve part one of the puzzle.
 
     >> import pprint
@@ -52,7 +52,7 @@ def part_one(puzzle: Iterator[str], n: int = 64) -> list[int]:
     return []
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -67,7 +67,7 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     return []
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[str]:
+def scan(puzzle: list[str]) -> Iterator[str]:
     for line in puzzle:
         yield line.strip("\n")
 

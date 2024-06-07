@@ -1,11 +1,12 @@
 from __future__ import annotations
+
+import doctest
+import functools
 from collections import deque, namedtuple
 from enum import Enum
-import functools
 from typing import Iterator
-import doctest
 
-day = "16"
+day = "16"  # https://adventofcode.com/2023/day/16
 
 example1 = r"""
 .|...\....
@@ -19,7 +20,6 @@ example1 = r"""
 .|....-|.\
 ..//.|....
 """
-
 
 example2 = example1
 
@@ -45,7 +45,7 @@ class Grid:
 
     @functools.cache
     def slide(self, x: int, y: int, d: Dir) -> int:
-        if not (x, y) in self:
+        if (x, y) not in self:
             return 0
         x2, y2 = x, y
         while (x2, y2) in self and self.grid[y2][x2].slide(d):
@@ -73,7 +73,7 @@ class Type(Enum):
     def __repr__(self) -> str:
         return self.value
 
-    def beam(self, d: Dir) -> list[Dir]:
+    def beam(self, d: Dir) -> list[Dir]:  # pyright: ignore [reportReturnType]
         if self == Type.EMPTY:
             return [d]
 
@@ -89,7 +89,7 @@ class Type(Enum):
         if self == Type.SPLITTER_VERTICAL:
             return ([Dir.U], [Dir.D], [Dir.U, Dir.D], [Dir.U, Dir.D])[d.value]
 
-    def proj(self, d: Dir) -> tuple[bool, bool]:
+    def proj(self, d: Dir) -> tuple[bool, bool]:  # pyright: ignore [reportReturnType]
         if self == Type.EMPTY:
             return (True, False) if d in (Dir.U, Dir.D) else (False, True)
 
@@ -105,7 +105,7 @@ class Type(Enum):
         if self == self == Type.SPLITTER_VERTICAL:
             return (False, True) if d in (Dir.U, Dir.D) else (True, True)
 
-    def slide(self, d: Dir) -> bool:
+    def slide(self, d: Dir) -> bool:  # pyright: ignore [reportReturnType]
         if self == Type.EMPTY:
             return True
 
@@ -123,7 +123,7 @@ class Type(Enum):
         return next(t for t in cls if s == t.value)
 
 
-def part_one(puzzle: Iterator[str]) -> str:
+def part_one(puzzle: list[str]) -> str:
     """Solve part one of the puzzle.
 
     >>> print(part_one(example1.splitlines()))
@@ -151,7 +151,7 @@ def part_one(puzzle: Iterator[str]) -> str:
     return "\n".join(result)
 
 
-def part_two(puzzle: Iterator[str]) -> tuple(int, Beam):
+def part_two(puzzle: list[str]) -> tuple[int, Beam]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -174,7 +174,7 @@ def part_two(puzzle: Iterator[str]) -> tuple(int, Beam):
             beam = Beam(x + i * dx, y + i * dy, d)
             if (v := len(solve(grid, beam))) > rs[0]:
                 rs = (v, beam)
-    return rs
+    return rs  # pyright: ignore [reportReturnType]
 
 
 def solve(grid: Grid, beam: Beam) -> set[complex]:
@@ -204,7 +204,7 @@ def solve(grid: Grid, beam: Beam) -> set[complex]:
     return seen[0].union(seen[1])
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[list[Type]]:
+def scan(puzzle: list[str]) -> Iterator[list[Type]]:
     for line in puzzle:
         if not (line := line.strip("\n")):
             continue

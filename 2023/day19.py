@@ -1,12 +1,12 @@
-from dataclasses import dataclass
-from typing import Iterator
 import collections
 import doctest
 import itertools
 import math
 import re
+from dataclasses import dataclass
+from typing import cast
 
-day = "19"
+day = "19"  # https://adventofcode.com/2023/day/19
 
 example1 = """\
 px{a<2006:qkq,m>2090:A,rfg}
@@ -48,7 +48,7 @@ class Rule:
             return False, ""
         return True, self.next
 
-    def split(self, part: Part) -> tuple[str, Part, Part]:
+    def split(self, part: Part) -> tuple[str | None, Part, Part]:
         if self.left:
             if part[self.what][0] >= self.left:
                 return None, Part((0, 0), (0, 0), (0, 0), (0, 0)), part
@@ -66,7 +66,7 @@ class Rule:
         return self.next, part, Part((0, 0), (0, 0), (0, 0), (0, 0))
 
 
-def part_one(puzzle: Iterator[str]) -> list[tuple[bool, list[int]]]:
+def part_one(puzzle: list[str]) -> list[tuple[bool, list[int]]]:
     """Solve part one of the puzzle.
 
     >>> import pprint
@@ -95,7 +95,7 @@ def part_one(puzzle: Iterator[str]) -> list[tuple[bool, list[int]]]:
     return res
 
 
-def part_two(puzzle: Iterator[str]) -> tuple[int, int]:
+def part_two(puzzle: list[str]) -> tuple[int, int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -119,11 +119,11 @@ def part_two(puzzle: Iterator[str]) -> tuple[int, int]:
             if name1 in ("A", "R"):
                 res[name1] += num1
                 continue
-            jobs.append((name1, part1))
+            jobs.append((name1, part1))  # pyright: ignore [reportArgumentType]
     return res["A"], res["R"]
 
 
-def scan(puzzle: Iterator[str]) -> tuple[dict[str, list[Rule]], list[Part]]:
+def scan(puzzle: list[str]) -> tuple[dict[str, list[Rule]], list[Part]]:
     workflows, parts = {}, []
     wr = re.compile(r"(?P<n>\w+){(.+),(?P<l>\w+)}")
     rr = re.compile(r"(?P<c>\w+)([<>])(?P<d>\d+):(?P<n>\w+)")
@@ -132,7 +132,7 @@ def scan(puzzle: Iterator[str]) -> tuple[dict[str, list[Rule]], list[Part]]:
         if not line.strip("\n"):
             continue
         if not line.startswith("{"):
-            m, rules = wr.match(line.strip("\n")), []
+            m, rules = cast(re.Match[str], wr.match(line.strip("\n"))), []
             for m2 in rr.finditer(m.group(2)):
                 left = int(m2["d"]) if m2.group(2) == ">" else 0
                 right = int(m2["d"]) if m2.group(2) == "<" else 0
@@ -140,7 +140,7 @@ def scan(puzzle: Iterator[str]) -> tuple[dict[str, list[Rule]], list[Part]]:
             rules.append(Rule(m["l"]))
             workflows[m["n"]] = rules
             continue
-        m = pr.match(line.strip("\n"))
+        m = cast(re.Match[str], pr.match(line.strip("\n")))
         parts.append(Part(int(m["x"]), int(m["m"]), int(m["a"]), int(m["s"])))
     return workflows, parts
 

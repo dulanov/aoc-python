@@ -1,11 +1,12 @@
 from __future__ import annotations
-from typing import Iterator
-from dataclasses import dataclass
+
 import doctest
 import functools
 import re
+from dataclasses import dataclass
+from typing import Iterator, cast
 
-day = "02"
+day = "02"  # https://adventofcode.com/2023/day/2
 
 example1 = """\
 Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
@@ -31,7 +32,7 @@ class RGB:
         return RGB(max(l.r, r.r), max(l.g, r.g), max(l.b, r.b))
 
 
-def part_one(puzzle: Iterator[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
+def part_one(puzzle: list[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -51,7 +52,7 @@ def part_one(puzzle: Iterator[str], limits: RGB = RGB(12, 13, 14)) -> list[int]:
     return result
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -70,12 +71,12 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     return result
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[list[RGB]]:
+def scan(puzzle: list[str]) -> Iterator[list[RGB]]:
     r1 = re.compile(r"Game (?:\d+): (?P<sets>.*)")
     r2 = re.compile(r"(?P<cubes>\d+) (?P<color>\w+)")
     for line in puzzle:
-        game = []
-        for s in (r1.match(line).group("sets")).split("; "):
+        game, sets = [], cast(re.Match[str], r1.match(line)).group("sets")
+        for s in sets.split("; "):
             r, g, b = 0, 0, 0
             for c in r2.finditer(s):
                 if c.group("color") == "red":

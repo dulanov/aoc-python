@@ -1,11 +1,13 @@
 import collections
-from itertools import chain
-from typing import Callable, Iterator
 import doctest
 import itertools
 import operator
+import typing
+from abc import abstractmethod
+from itertools import chain
+from typing import Callable, Iterable, Iterator, cast
 
-day = "20"
+day = "20"  # https://adventofcode.com/2023/day/20
 
 example11 = """\
 broadcaster -> a, b, c
@@ -25,25 +27,29 @@ broadcaster -> a
 
 example2 = example12
 
-Pulse = collections.namedtuple("Pulse", "tx rx hp")
+Pulse = typing.NamedTuple("Pulse", [("tx", str), ("rx", str), ("hp", bool)])
 
 
 class Module:
-    def __init__(self, dest: Iterator[str]) -> None:
+    def __init__(self, dest: Iterable[str]) -> None:
         self._dest = list(dest)
+
+    @abstractmethod
+    def receive(self, tx: str, hp: bool) -> Iterator[tuple[str, bool]]:
+        pass
 
 
 class Broadcaster(Module):
-    def receive(self, _: str, hp: bool) -> Iterator[tuple[str, bool]]:
+    def receive(self, tx: str, hp: bool) -> Iterator[tuple[str, bool]]:
         return ((rx, hp) for rx in self._dest)
 
 
 class FlipFlop(Module):
-    def __init__(self, dest: Iterator[str]) -> None:
+    def __init__(self, dest: Iterable[str]) -> None:
         super().__init__(dest)
         self._state = False
 
-    def receive(self, _: str, hp: bool) -> Iterator[tuple[str, bool]]:
+    def receive(self, tx: str, hp: bool) -> Iterator[tuple[str, bool]]:
         if hp:
             return iter(())
         self._state = not self._state
@@ -51,7 +57,7 @@ class FlipFlop(Module):
 
 
 class Inverter(Module):
-    def __init__(self, dest: Iterator[str]) -> None:
+    def __init__(self, dest: Iterable[str]) -> None:
         super().__init__(dest)
         self._state = collections.defaultdict(bool)
         self._inputs = 0
@@ -70,7 +76,7 @@ class Inverter(Module):
         return ((rx, v) for rx in self._dest)
 
 
-def part_one(puzzle: Iterator[str], n: int = 1_000) -> tuple[int, int]:
+def part_one(puzzle: list[str], n: int = 1_000) -> tuple[int, int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example11.splitlines())
@@ -92,13 +98,13 @@ def part_one(puzzle: Iterator[str], n: int = 1_000) -> tuple[int, int]:
     modules, rs = dict(scan(puzzle)), [0, 0]
     for d in chain.from_iterable(m._dest for m in modules.values()):
         if d in modules and isinstance(modules[d], Inverter):
-            modules[d].inputs += 1
+            cast(Inverter, modules[d]).inputs += 1
     for _ in range(n):
         cycle(modules, lambda _, hp: operator.setitem(rs, hp, rs[hp] + 1))
-    return tuple(rs)
+    return cast(tuple[int, int], tuple(rs))
 
 
-def part_two(puzzle: Iterator[str]) -> tuple[int, int, int, int]:
+def part_two(puzzle: list[str]) -> tuple[int, int, int, int]:
     """Solve part two of the puzzle.
 
     >>> import math
@@ -108,7 +114,7 @@ def part_two(puzzle: Iterator[str]) -> tuple[int, int, int, int]:
     modules, rs = dict(scan(puzzle)), []
     for d in chain.from_iterable(m._dest for m in modules.values()):
         if d in modules and isinstance(modules[d], Inverter):
-            modules[d].inputs += 1
+            cast(Inverter, modules[d]).inputs += 1
     for i in itertools.count(1):
         if len(rs) == 4:
             break
@@ -128,7 +134,7 @@ def cycle(modules: dict[str, Module], fn: Callable[[str, bool], None]) -> None:
             q.append(Pulse(rx, rx2, hp2))
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[tuple[str, str, Module]]:
+def scan(puzzle: list[str]) -> Iterator[tuple[str, Module]]:
     for line in puzzle:
         src, dest = line.strip("\n").split(" -> ")
         if src.startswith("%"):

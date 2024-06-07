@@ -1,18 +1,16 @@
-from itertools import starmap
-from typing import Iterator
-from operator import mul
 import doctest
 import functools
+from itertools import starmap
+from operator import mul
 
-day = "15"
+day = "15"  # https://adventofcode.com/2023/day/15
 
 example1 = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7"
-
 
 example2 = example1
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -27,7 +25,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return [calc_hash(line) for line in scan(puzzle)]
 
 
-def part_two(puzzle: Iterator[str]) -> list[tuple[int, int]]:
+def part_two(puzzle: list[str]) -> list[tuple[int, int]]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -46,9 +44,7 @@ def part_two(puzzle: Iterator[str]) -> list[tuple[int, int]]:
                 bs[calc_hash(lb)][lb] = int(n)
             case [lb]:
                 bs[calc_hash(lb)].pop(lb, 0)
-    return [
-        (i, sum(starmap(mul, enumerate(b.values(), 1)))) for i, b in enumerate(bs) if b
-    ]
+    return [(i, sum(starmap(mul, enumerate(b.values(), 1)))) for i, b in enumerate(bs) if b]
 
 
 def calc_hash(s: str) -> int:
@@ -60,7 +56,7 @@ def calc_hash(s: str) -> int:
     return functools.reduce(lambda n, c: (n + ord(c)) * 17 % 256, s, 0)
 
 
-def scan(puzzle: Iterator[str]) -> list[str]:
+def scan(puzzle: list[str]) -> list[str]:  # pyright: ignore [reportReturnType]
     for line in puzzle:
         return line.strip().split(",")
 

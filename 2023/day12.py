@@ -1,9 +1,9 @@
-from typing import Iterator
 import doctest
 import functools
 import itertools
+from typing import Iterator
 
-day = "12"
+day = "12"  # https://adventofcode.com/2023/day/12
 
 example1 = """\
 ???.### 1,1,3
@@ -18,7 +18,7 @@ example1 = """\
 example2 = example1
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -33,7 +33,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return [arrange(pattern, *groups) for pattern, groups in scan(puzzle)]
 
 
-def part_two(puzzle: Iterator[str], copies: int = 5) -> list[int]:
+def part_two(puzzle: list[str], copies: int = 5) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -53,7 +53,7 @@ def part_two(puzzle: Iterator[str], copies: int = 5) -> list[int]:
 
 
 @functools.cache
-def arrange(pattern: str, *groups: list[int]) -> int:
+def arrange(pattern: str, *groups: int) -> int:
     """Found all possible arrangements of a pattern.
 
     >>> arrange("???.###", 1, 1, 3)
@@ -91,7 +91,7 @@ def is_group(pattern: str) -> bool:
     return "." not in pattern[:-1] and pattern[-1] != "#"
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[tuple[str, list[int]]]:
+def scan(puzzle: list[str]) -> Iterator[tuple[str, list[int]]]:
     for line in puzzle:
         pattern, groups = line.split()
         yield pattern, list(map(int, groups.split(",")))

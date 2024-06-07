@@ -1,12 +1,12 @@
-from enum import Enum
-from itertools import pairwise
-from typing import Iterator
 import bisect
 import collections
 import doctest
 import functools
+from enum import Enum
+from itertools import pairwise
+from typing import Iterator
 
-day = "14"
+day = "14"  # https://adventofcode.com/2023/day/14
 
 example1 = """\
 O....#....
@@ -21,7 +21,6 @@ O.#..O.#.#
 #OO..#....
 """
 
-
 example2 = example1
 
 
@@ -32,7 +31,7 @@ class Dir(Enum):
 Pos = collections.namedtuple("Pos", "x y")
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -53,11 +52,11 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
                 rocks.extend((Pos(i, -1), Pos(-1, i), Pos(i, size), Pos(size, i)))
         rocks.extend(cube_shaped)
         cubes.extend(rounded)
-    rocks = iter(rocks, size, vert=True)
-    return list(map(len, iter(tilt(rocks, cubes, size), size)))
+    rocks = iter(rocks, size, vert=True)  # pyright: ignore [reportPossiblyUnboundVariable]
+    return list(map(len, iter(tilt(rocks, cubes, size), size)))  # type: ignore
 
 
-def part_two(puzzle: Iterator[str], circles: int = 1_000_000_000) -> list[int]:
+def part_two(puzzle: list[str], circles: int = 1_000_000_000) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines(), circles=1)
@@ -84,7 +83,7 @@ def part_two(puzzle: Iterator[str], circles: int = 1_000_000_000) -> list[int]:
                 rocks.extend((Pos(i, -1), Pos(-1, i), Pos(i, size), Pos(size, i)))
         rocks.extend(cube_shaped)
         cubes.extend(rounded)
-    loop_hash, vrocks, hrocks = {}, iter(rocks, size, vert=True), iter(rocks, size)
+    loop_hash, vrocks, hrocks = {}, iter(rocks, size, vert=True), iter(rocks, size)  # type: ignore
     while circles > 0:
         for dir, rocks in [
             (Dir.N, vrocks),
@@ -92,22 +91,22 @@ def part_two(puzzle: Iterator[str], circles: int = 1_000_000_000) -> list[int]:
             (Dir.S, vrocks),
             (Dir.E, hrocks),
         ]:
-            cubes = tilt(rocks, cubes, size, dir)
+            cubes = tilt(rocks, cubes, size, dir)  # pyright: ignore [reportPossiblyUnboundVariable]
         circles, hsh = circles - 1, hash(tuple(cubes))
         if hsh in loop_hash:
             circles %= loop_hash[hsh] - circles
         loop_hash[hsh] = circles
-    return list(map(len, iter(cubes, size)))
+    return list(map(len, iter(cubes, size)))  # pyright: ignore [reportPossiblyUnboundVariable]
 
 
 def tilt(rs: list[list[Pos]], cs: list[Pos], n: int, d: Dir = Dir.N) -> list[Pos]:
     new_cubes, vert, rev = [], d in (Dir.N, Dir.S), d in (Dir.S, Dir.E)
-    for rs, cs in zip(map(pairwise, rs), iter(cs, n, vert=vert)):
+    for rs2, cs2 in zip(map(pairwise, rs), iter(cs, n, vert=vert)):
         lo = None
-        for r1, r2 in rs:
+        for r1, r2 in rs2:
             if lo is None:
-                lo = bisect.bisect(cs, r1)
-            lo, prev = bisect.bisect(cs, r2, lo), lo
+                lo = bisect.bisect(cs2, r1)
+            lo, prev = bisect.bisect(cs2, r2, lo), lo
             new_cubes.extend(cubes(r1, r2, lo - prev, vert=vert, rev=rev))
     return new_cubes
 
@@ -123,15 +122,13 @@ def iter(l: list[Pos], n: int, /, *, vert: bool = False) -> list[list[Pos]]:
 
 
 @functools.cache
-def cubes(
-    p1: Pos, p2: Pos, n: int, /, *, vert: bool = False, rev: bool = False
-) -> list[Pos]:
+def cubes(p1: Pos, p2: Pos, n: int, /, *, vert: bool = False, rev: bool = False) -> list[Pos]:
     delta = (0, 1) if vert else (1, 0)
     p, delta = (p1, delta) if not rev else (p2, (-delta[0], -delta[1]))
     return [Pos(p.x + i * delta[0], p.y + i * delta[1]) for i in range(1, n + 1)]
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[tuple[int, tuple[list[Pos], list[Pos]]]]:
+def scan(puzzle: list[str]) -> Iterator[tuple[int, tuple[list[Pos], list[Pos]]]]:
     for y, line in enumerate(puzzle):
         rounded = [Pos(x, y) for x, c in enumerate(line.strip()) if c == "O"]
         cube_shaped = [Pos(x, y) for x, c in enumerate(line.strip()) if c == "#"]

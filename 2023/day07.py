@@ -1,10 +1,11 @@
 from __future__ import annotations
-from enum import Enum, auto
-from typing import Iterator
+
 import collections
 import doctest
+from enum import Enum, auto
+from typing import Iterator
 
-day = "07"
+day = "07"  # https://adventofcode.com/2023/day/7
 
 example1 = """\
 32T3K 765
@@ -30,7 +31,7 @@ class HandType(Enum):
         return self.value < other.value
 
     @classmethod
-    def from_str(cls, s: str) -> HandType:
+    def from_str(cls, s: str) -> HandType | None:
         """Return the hand type from a string.
 
         >>> HandType.from_str("AAAAA")
@@ -72,7 +73,7 @@ class HandType(Enum):
                 return cls.HIGH_CARD
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> import pprint
@@ -92,10 +93,10 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     result = []
     for hand in scan(puzzle):
         result.append((HandType.from_str(hand[0]), hand[0], hand[1]))
-    return sorted(result, key=lambda t: (t[0], *map("23456789TJQKA".index, t[1])))
+    return sorted(result, key=lambda t: (t[0], *map("23456789TJQKA".index, t[1])))  # type: ignore
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> import pprint
@@ -115,7 +116,7 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     result = []
     for hand in scan(puzzle):
         result.append((HandType.from_str(opt(hand[0])), hand[0], hand[1]))
-    return sorted(result, key=lambda t: (t[0], *map("J23456789TQKA".index, t[1])))
+    return sorted(result, key=lambda t: (t[0], *map("J23456789TQKA".index, t[1])))  # type: ignore
 
 
 def opt(hand: str) -> str:
@@ -123,7 +124,7 @@ def opt(hand: str) -> str:
     return hand.replace("J", c.most_common()[0][0] if c else "J")
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[tuple[int, str]]:
+def scan(puzzle: list[str]) -> Iterator[tuple[str, int]]:
     for line in puzzle:
         els = line.split()
         yield els[0], int(els[1])

@@ -1,9 +1,9 @@
-from itertools import chain
-import itertools
-from typing import Iterator
 import doctest
+import itertools
+from itertools import chain
+from typing import Iterator
 
-day = "11"
+day = "11"  # https://adventofcode.com/2023/day/11
 
 example1 = """\
 ...#......
@@ -22,7 +22,7 @@ example1 = """\
 example2 = example1
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> len(part_one(example1.splitlines()))
@@ -43,7 +43,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return [distance(a, b) for a, b in itertools.combinations(galaxies, 2)]
 
 
-def part_two(puzzle: Iterator[str], factor: int = 1000000) -> list[int]:
+def part_two(puzzle: list[str], factor: int = 1000000) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> sum(part_two(example2.splitlines(), factor=10))
@@ -73,7 +73,7 @@ def distance(a: tuple[int, int], b: tuple[int, int]) -> int:
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[list[tuple[int, int]]]:
+def scan(puzzle: list[str]) -> Iterator[list[tuple[int, int]]]:
     for y, line in enumerate(puzzle):
         yield [(x, y) for x, c in enumerate(line) if c == "#"]
 

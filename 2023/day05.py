@@ -1,11 +1,10 @@
-from typing import Iterator
 import bisect
 import collections
 import doctest
 import operator
 import re
 
-day = "05"
+day = "05"  # https://adventofcode.com/2023/day/5
 
 example1 = """\
 seeds: 79 14 55 13
@@ -48,7 +47,7 @@ example2 = example1
 Map = collections.namedtuple("Map", ["fr", "to", "dlt"])
 
 
-def part_one(puzzle: Iterator[str]) -> list[tuple[int, ...]]:
+def part_one(puzzle: list[str]) -> list[tuple[int, ...]]:
     """Solve part one of the puzzle.
 
     >>> import pprint
@@ -76,7 +75,7 @@ def part_one(puzzle: Iterator[str]) -> list[tuple[int, ...]]:
     return paths
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> list[tuple[int, int]]:
     """Solve part two of the puzzle.
 
     >>> part_two(example1.splitlines())
@@ -110,13 +109,13 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     return ranges
 
 
-def scan(puzzle: Iterator[str]) -> tuple[list[int], tuple[list[Map], ...]]:
-    maps = []
+def scan(puzzle: list[str]) -> tuple[list[int], tuple[list[Map], ...]]:
+    maps, seeds = [], []
     for line in puzzle:
         if line.startswith("seeds:"):
             seeds = list(map(int, re.findall(r"(\d+)+", line)))
         elif line.rstrip().endswith(":"):
-            maps.append([(0, 0, 0)])  # bissect requires initial value
+            maps.append([(0, 0, 0)])  # bisect requires initial value
         elif line.rstrip():
             maps[-1].append(tuple(map(int, line.split())))
     for i in range(len(maps)):  # post-processing

@@ -1,9 +1,8 @@
-from typing import Iterator
 import doctest
 import itertools
 import re
 
-day = "08"
+day = "08"  # https://adventofcode.com/2023/day/8
 
 example11 = """\
 RL
@@ -39,7 +38,7 @@ XXX = (XXX, XXX)
 """
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[str]:
     """Solve part one of the puzzle.
 
     >>> part_one(example11.splitlines())
@@ -66,7 +65,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return path
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -90,13 +89,13 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     return ns
 
 
-def scan(puzzle: Iterator[str]) -> tuple[list[int], list[tuple[str, str, str]]]:
+def scan(puzzle: list[str]) -> tuple[list[int], list[tuple[str, str, str]]]:
     ins, nodes, r = [], [], re.compile(r"(\w{3}) = \((\w{3}), (\w{3})\)")
     for line in puzzle:
         if not ins:
             ins = [1 if c == "R" else 0 for c in line.strip()]
         elif line.strip():
-            nodes.append(r.match(line).groups())
+            nodes.append(r.match(line).groups())  # pyright: ignore [reportOptionalMemberAccess]
     return ins, nodes
 
 

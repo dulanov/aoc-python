@@ -1,8 +1,8 @@
-from typing import Iterator
 import doctest
 import itertools
+from typing import Iterator
 
-day = "09"
+day = "09"  # https://adventofcode.com/2023/day/9
 
 example1 = """\
 0 3 6 9 12 15
@@ -14,7 +14,7 @@ example1 = """\
 example2 = example1
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -37,7 +37,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return result
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -60,7 +60,7 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     return result
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[list[int]]:
+def scan(puzzle: list[str]) -> Iterator[list[int]]:
     for line in puzzle:
         yield list(map(int, line.split()))
 

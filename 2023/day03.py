@@ -1,12 +1,13 @@
 from __future__ import annotations
-from typing import Iterator
-from dataclasses import dataclass
-import doctest
-import re
-import operator
-import uuid
 
-day = "03"
+import doctest
+import operator
+import re
+import uuid
+from dataclasses import dataclass
+from typing import Iterator
+
+day = "03"  # https://adventofcode.com/2023/day/3
 
 example1 = """\
 467..114..
@@ -47,7 +48,7 @@ class Point:
         return points
 
 
-def part_one(puzzle: Iterator[str]) -> tuple[list[int], list[int]]:
+def part_one(puzzle: list[str]) -> tuple[list[int], list[int]]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -71,7 +72,7 @@ def part_one(puzzle: Iterator[str]) -> tuple[list[int], list[int]]:
     return sorted(adj), sorted(ndj)
 
 
-def part_two(puzzle: Iterator[str]) -> list[tuple(int, int)]:
+def part_two(puzzle: list[str]) -> list[tuple[int, int]]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -104,7 +105,7 @@ def part_two(puzzle: Iterator[str]) -> list[tuple(int, int)]:
     return gears
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[tuple[Point, str]]:
+def scan(puzzle: list[str]) -> Iterator[tuple[Point, str]]:
     r = re.compile(r"(?P<num>\d+)|(?P<sym>[^\.\d\n]+)")
     for y, line in enumerate(puzzle):
         for m in r.finditer(line):

@@ -1,10 +1,11 @@
 from __future__ import annotations
-from enum import Enum
-import operator
-from typing import Iterator
-import doctest
 
-day = "18"
+import doctest
+import operator
+from enum import Enum
+from typing import Iterator
+
+day = "18"  # https://adventofcode.com/2023/day/18
 
 example1 = """\
 R 6 (#70c710)
@@ -37,7 +38,7 @@ class Dir(Enum):
         )
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> tuple[int, int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -52,7 +53,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return solve(map(operator.itemgetter(0), scan(puzzle)))
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> tuple[int, int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -67,7 +68,7 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     return solve(map(operator.itemgetter(1), scan(puzzle)))
 
 
-def solve(plan: list[tuple[Dir, int]]) -> tuple[int, int]:
+def solve(plan: map[tuple[Dir, int]]) -> tuple[int, int]:
     # https://en.wikipedia.org/wiki/Pick's_theorem
     # https://en.wikipedia.org/wiki/Shoelace_formula
     x, y, a, b = 0, 0, 0, 0
@@ -78,7 +79,7 @@ def solve(plan: list[tuple[Dir, int]]) -> tuple[int, int]:
     return a - b // 2 + 1, b
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[tuple[tuple[Dir, int], tuple[Dir, int]]]:
+def scan(puzzle: list[str]) -> Iterator[tuple[tuple[Dir, int], tuple[Dir, int]]]:
     for line in puzzle:
         entries = line.strip("\n").split()
         yield (Dir[entries[0]], int(entries[1])), (

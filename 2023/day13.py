@@ -1,7 +1,7 @@
-from typing import Iterator
 import doctest
+from typing import Iterator
 
-day = "13"
+day = "13"  # https://adventofcode.com/2023/day/13
 
 example1 = """\
 #.##..##.
@@ -25,7 +25,7 @@ example1 = """\
 example2 = example1
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -53,7 +53,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return result
 
 
-def part_two(puzzle: Iterator[str], copies: int = 5) -> list[int]:
+def part_two(puzzle: list[str], copies: int = 5) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines())
@@ -97,7 +97,7 @@ def as_num(pattern: list[bool]) -> int:
     return sum(2**i for i, b in enumerate(pattern) if b)
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[list[list[bool]]]:
+def scan(puzzle: list[str]) -> Iterator[list[list[bool]]]:
     pattern = []
     for line in puzzle:
         if line.strip():

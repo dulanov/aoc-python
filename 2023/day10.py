@@ -1,9 +1,10 @@
 from __future__ import annotations
-from enum import Enum
-from typing import Iterator
-import doctest
 
-day = "10"
+import doctest
+from enum import Enum
+from typing import Iterator, Literal
+
+day = "10"  # https://adventofcode.com/2023/day/10
 
 example11 = """\
 -L|F7
@@ -12,7 +13,6 @@ L|7||
 -L-J|
 L|-JF
 """
-
 
 example12 = """\
 7-F7-
@@ -85,18 +85,18 @@ class Tile(Enum):
     STRT = ("S", None, None)
     GND = (".", None, None)
 
-    def other(self, d: Dir) -> Dir:
+    def other(self, d: Dir) -> Literal[Dir.N, Dir.W, Dir.E, Dir.S]:
         d1, d2 = self.value[1], self.value[2]
         if d.inv() != d1 and d.inv() != d2:
             raise ValueError(f"{d} not supported by {self}")
-        return d1 if d.inv() == d2 else d2
+        return d1 if d.inv() == d2 else d2  # pyright: ignore [reportReturnType]
 
     @classmethod
     def from_str(cls, s: str) -> Tile:
         return next(t for t in cls if s == t.value[0])
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[tuple[int, int, Dir]]:
     """Solve part one of the puzzle.
 
     >>> import pprint
@@ -144,16 +144,16 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
         grid.append(tiles)
     for d in [Dir.N, Dir.E, Dir.S, Dir.W]:
         try:
-            x, y = d(sx, sy)
+            x, y = d(sx, sy)  # pyright: ignore [reportPossiblyUnboundVariable]
             grid[y][x].other(d)
         except ValueError:
             continue
         else:
             break
-    return list(iter(grid, sx, sy, d))
+    return list(iter(grid, sx, sy, d))  # pyright: ignore [reportPossiblyUnboundVariable]
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example21.splitlines())
@@ -184,13 +184,13 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
         grid.append(tiles)
     for d in [Dir.N, Dir.E, Dir.S, Dir.W]:
         try:
-            x, y = d(sx, sy)
+            x, y = d(sx, sy)  # pyright: ignore [reportPossiblyUnboundVariable]
             grid[y][x].other(d)
         except ValueError:
             continue
         else:
             break
-    enclosed, loop = [], {(x, y): d for x, y, d in iter(grid, sx, sy, d)}
+    enclosed, loop = [], {(x, y): d for x, y, d in iter(grid, sx, sy, d)}  # type: ignore
     for y in range(len(grid)):
         winding = 0  # https://en.wikipedia.org/wiki/Nonzero-rule
         for x in range(len(grid[y])):
@@ -204,9 +204,7 @@ def part_two(puzzle: Iterator[str]) -> list[int]:
     return enclosed
 
 
-def iter(
-    grid: list[list[Tile]], x: int, y: int, d: Dir
-) -> Iterator[tuple[int, int, Dir]]:
+def iter(grid: list[list[Tile]], x: int, y: int, d: Dir) -> Iterator[tuple[int, int, Dir]]:
     while True:
         yield x, y, d
         x, y = d(x, y)
@@ -215,7 +213,7 @@ def iter(
         d = grid[y][x].other(d)
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[list[Tile]]:
+def scan(puzzle: list[str]) -> Iterator[list[Tile]]:
     for line in puzzle:
         yield list(map(Tile.from_str, line))
 

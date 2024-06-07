@@ -1,8 +1,8 @@
-from typing import Iterator
 import doctest
 import re
+from typing import Iterator
 
-day = "04"
+day = "04"  # https://adventofcode.com/2023/day/4
 
 example1 = """\
 Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
@@ -16,7 +16,7 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 example2 = example1
 
 
-def part_one(puzzle: Iterator[str]) -> list[int]:
+def part_one(puzzle: list[str]) -> list[int]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -37,7 +37,7 @@ def part_one(puzzle: Iterator[str]) -> list[int]:
     return result
 
 
-def part_two(puzzle: Iterator[str], n: int) -> list[int]:
+def part_two(puzzle: list[str], n: int) -> list[int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example2.splitlines(), 6)
@@ -56,10 +56,10 @@ def part_two(puzzle: Iterator[str], n: int) -> list[int]:
     return cards
 
 
-def scan(puzzle: Iterator[str]) -> Iterator[tuple[set[int], set[int]]]:
+def scan(puzzle: list[str]) -> Iterator[tuple[set[int], set[int]]]:
     r = re.compile(r"Card\s+\d+:(.*)\|(.*)")
     for line in puzzle:
-        g1, g2 = r.match(line).groups()
+        g1, g2 = r.match(line).groups()  # pyright: ignore [reportOptionalMemberAccess]
         yield set(map(int, g1.split())), set(map(int, g2.split()))
 
 

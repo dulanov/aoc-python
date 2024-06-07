@@ -1,10 +1,12 @@
 {
     "cSpell.language": "en,en-US",
     "cSpell.words": [
+        "popleft"
     ],
     "files.exclude": {
         "*/**/__pycache__": true
     },
+    "black-formatter.args": ["--line-length", "100"],
     "[python]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-python.black-formatter",
@@ -16,5 +18,8 @@
     "python.languageServer": "Pylance",
     "python.analysis.autoImportCompletions": true,
     "python.analysis.diagnosticMode": "openFilesOnly",
+    "python.analysis.typeCheckingMode": "standard",
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+    "python.terminal.activateEnvironment": true,
     "python.testing.unittestEnabled": true
 }

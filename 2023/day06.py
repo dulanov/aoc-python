@@ -1,9 +1,8 @@
-from typing import Iterator
 import doctest
 import math
 import re
 
-day = "06"
+day = "06"  # https://adventofcode.com/2023/day/6
 
 example1 = """\
 Time:      7  15   30
@@ -13,7 +12,7 @@ Distance:  9  40  200
 example2 = example1
 
 
-def part_one(puzzle: Iterator[str]) -> list[tuple[int, int]]:
+def part_one(puzzle: list[str]) -> list[tuple[int, int]]:
     """Solve part one of the puzzle.
 
     >>> part_one(example1.splitlines())
@@ -33,7 +32,7 @@ def part_one(puzzle: Iterator[str]) -> list[tuple[int, int]]:
     return wins
 
 
-def part_two(puzzle: Iterator[str]) -> list[int]:
+def part_two(puzzle: list[str]) -> tuple[int, int]:
     """Solve part two of the puzzle.
 
     >>> part_two(example1.splitlines())
@@ -67,7 +66,7 @@ def solve(t: int, d: int) -> tuple[int, int]:
     return n1, n2
 
 
-def scan(puzzle: Iterator[str], collapsed: bool = False) -> list[tuple[int, int]]:
+def scan(puzzle: list[str], collapsed: bool = False) -> list[tuple[int, int]]:
     for line in puzzle:
         if line.startswith("Time:"):
             if collapsed:
@@ -79,7 +78,7 @@ def scan(puzzle: Iterator[str], collapsed: bool = False) -> list[tuple[int, int]
                 distance = int("".join(re.findall(r"\d+", line)))
             else:
                 distances = list(map(int, re.findall(r"\d+", line)))
-    return [(time, distance)] if collapsed else list(zip(times, distances))
+    return [(time, distance)] if collapsed else list(zip(times, distances))  # type: ignore
 
 
 def load_tests(loader, tests, ignore):
