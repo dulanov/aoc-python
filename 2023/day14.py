@@ -85,13 +85,8 @@ def part_two(puzzle: list[str], circles: int = 1_000_000_000) -> list[int]:
         cubes.extend(rounded)
     loop_hash, vrocks, hrocks = {}, iter(rocks, size, vert=True), iter(rocks, size)  # type: ignore
     while circles > 0:
-        for dir, rocks in [
-            (Dir.N, vrocks),
-            (Dir.W, hrocks),
-            (Dir.S, vrocks),
-            (Dir.E, hrocks),
-        ]:
-            cubes = tilt(rocks, cubes, size, dir)  # pyright: ignore [reportPossiblyUnboundVariable]
+        for dir, rocks in [(Dir.N, vrocks), (Dir.W, hrocks), (Dir.S, vrocks), (Dir.E, hrocks)]:
+            cubes = tilt(rocks, cubes, size, dir)  # pyright: ignore
         circles, hsh = circles - 1, hash(tuple(cubes))
         if hsh in loop_hash:
             circles %= loop_hash[hsh] - circles

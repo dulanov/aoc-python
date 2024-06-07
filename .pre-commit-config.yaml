@@ -9,7 +9,7 @@ repos:
   rev: 24.4.2
   hooks:
   - id: black
-    args: [--line-length=100]
+    args: [--line-length=99]
     name: check format
 - repo: https://github.com/RobertCraigie/pyright-python
   rev: v1.1.366
